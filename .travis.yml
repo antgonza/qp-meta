@@ -29,7 +29,7 @@ install:
   - qiita-env make --no-load-ontologies
   - source deactivate
   # installing qp-woltka
-  - conda create --yes -n qp-woltka biom-format bowtie2 sortmerna=2.1b
+  - conda create --yes -n qp-woltka biom-format bowtie2 sortmerna=2.1b samtools pigz
   - source activate qp-woltka
   - pip install -U pip pip nose flake8
   - pip install sphinx sphinx-bootstrap-theme nose-timer codecov biopython
