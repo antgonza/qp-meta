@@ -47,7 +47,7 @@ install:
   # making sure we have the correct software versions
   - woltka_version=`woltka --version`
   - bowtie2_version=`bowtie2 --version`
-  - if [[ $woltka_version != *"1.0.8"* ]]; then echo "wrong woltka version", $woltka_version; exit 1; fi
+  - if [[ $woltka_version != *"0.1.1"* ]]; then echo "wrong Woltka version", $woltka_version; exit 1; fi
   - if [[ $bowtie2_version != *"2.4.2"* ]]; then echo "wrong bowtie2 version", $bowtie2_version; exit 1; fi
   - configure_woltka --env-script "source activate qp-woltka" --server-cert $QIITA_SERVER_CERT
 before_script:

@@ -19,10 +19,6 @@ woltka_PARAMS = {
     'Percent identity': 'percent_id'}
 
 ALN2EXT = {
-    # if you uncomment these lines, also uncomment the tests:
-    #    test_woltka_utree, test_woltka_burst
-    # 'utree': 'tsv',
-    # 'burst': 'b6',
     'bowtie2': 'sam'
 }
 

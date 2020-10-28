@@ -24,8 +24,6 @@ opt_params = {
                  default_db_list.split(',')[0].strip('"')],
     # aligner
     'Aligner tool': ['choice:[' +
-                     # '"utree", ' +
-                     # '"burst", ' +
                      '"bowtie2"]', 'bowtie2'],
     # threads
     'Number of threads': ['integer', '10'],
@@ -43,5 +41,5 @@ outputs = {
 dflt_param_set = generate_woltka_dflt_params()
 
 woltka_cmd = QiitaCommand(
-    'woltka v1.0.8', "Functional and Taxonomic Predictions", woltka,
+    'Woltka v0.1.1', "Functional and Taxonomic Predictions", woltka,
     req_params, opt_params, outputs, dflt_param_set)

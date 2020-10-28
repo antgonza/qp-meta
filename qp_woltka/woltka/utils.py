@@ -17,8 +17,6 @@ import pandas as pd
 from biom import Table
 
 ALIGNERS = [
-    # "utree",
-    # "burst",
     "bowtie2"]
 
 
