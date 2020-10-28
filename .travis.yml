@@ -43,7 +43,9 @@ install:
   - for file in $(ls $QC_woltka_DB_DP); do tar xvjf $QC_woltka_DB_DP$file -C $QC_woltka_DB_DP; done
   # the min WoL coords file needs to be renamed WoLr1.coords
   - mv ${QC_woltka_DB_DP}/wol/WoLmin.coords ${QC_woltka_DB_DP}/wol/WoLr1.coords
-  - for file in $(ls $QC_SORTMERNA_DB_DP); do tar xvjf $QC_SORTMERNA_DB_DP$file -C $QC_SORTMERNA_DB_DP; done
+  - pushd QC_SORTMERNA_DB_DP
+  - for file in $(ls); do gunzip $file; done
+  - popd
   # making sure we have the correct software versions
   - woltka_version=`woltka --version`
   - bowtie2_version=`bowtie2 --version`
