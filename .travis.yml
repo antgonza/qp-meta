@@ -60,7 +60,7 @@ before_script:
   - cat /tmp/supervisord.log
 script:
   - source activate qp-woltka
-  - travis_wait 40 nosetests $COVER_PACKAGE --with-doctest --with-coverage --with-timer -vv --cover-package=$COVER_PACKAGE
+  - travis_wait 40 nosetests $COVER_PACKAGE --with-doctest --with-coverage --with-timer -vv --cover-package=$COVER_PACKAGE -e 'test_wol_bt2' -e 'test_woltka_bt2'
   - flake8 qp_woltka setup.py scripts
 addons:
   postgresql: "9.5"
