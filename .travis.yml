@@ -1,0 +1,83 @@
+dist: xenial
+language: python
+sudo: false
+env:
+  - PYTHON_VERSION=3.6 COVER_PACKAGE="qp_woltka/filter qp_woltka/trim qp_woltka/woltka qp_woltka/sortmerna"
+before_install:
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b
+  - export PATH=/home/travis/miniconda3/bin:$PATH
+  # Update conda itself
+  - conda update --yes conda
+install:
+  # installing qiita environment
+  - conda config --add channels anaconda
+  - conda config --add channels conda-forge
+  - travis_retry conda create -q --yes -n qiita python=3.6 pip libgfortran numpy nginx cython
+  - source activate qiita
+  - pip install sphinx sphinx-bootstrap-theme coveralls
+  - pip install https://github.com/biocore/qiita/archive/dev.zip --no-binary redbiom
+  - sed 's/PORT = 7777/PORT = 6379/g' ${HOME}/miniconda3/envs/qiita/lib/python3.6/site-packages/qiita_core/support_files/config_test.cfg > config_test.cfg
+  - export QIITA_CONFIG_FP=${PWD}/config_test.cfg
+  # starting nginx
+  - mkdir /home/travis/miniconda3/envs/qiita/var/run/nginx/
+  - wget https://github.com/biocore/qiita/archive/dev.zip -O qiita-dev.zip
+  - unzip qiita-dev.zip
+  - nginx -c ${PWD}/qiita-dev/qiita_pet/nginx_example.conf
+  - qiita-env make --no-load-ontologies
+  - source deactivate
+  # installing qp-woltka
+  - conda config --add channels defaults
+  - conda config --add channels bioconda
+  - conda config --add channels conda-forge
+  - conda create --yes -n qp-woltka -c biom-format bowtie2 sortmerna=2.1b
+  - source activate qp-woltka
+  - pip install -U pip pip nose flake8
+  - pip install sphinx sphinx-bootstrap-theme nose-timer codecov biopython
+  - pip install https://github.com/qiita-spots/qiita_client/archive/master.zip
+  - pip install atropos
+  - export QIITA_SERVER_CERT=$HOME/miniconda3/envs/qiita/lib/python3.6/site-packages/qiita_core/support_files/server.crt
+  - pip install .
+  - export QC_FILTER_DB_DP=$PWD/qp_woltka/filter/databases/
+  - export QC_woltka_DB_DP=$PWD/qp_woltka/woltka/databases/
+  - export QC_SORTMERNA_DB_DP=$PWD/qp_woltka/sortmerna/databases/rRNA_databases/
+  - for file in $(ls $QC_woltka_DB_DP); do tar xvjf $QC_woltka_DB_DP$file -C $QC_woltka_DB_DP; done
+  # the min WoL coords file needs to be renamed WoLr1.coords
+  - mv ${QC_woltka_DB_DP}/wol/WoLmin.coords ${QC_woltka_DB_DP}/wol/WoLr1.coords
+  - for file in $(ls $QC_SORTMERNA_DB_DP); do tar xvjf $QC_SORTMERNA_DB_DP$file -C $QC_SORTMERNA_DB_DP; done
+  # woltka is currently installing an old version of burst so let's install the correct one
+  - wget https://github.com/knights-lab/BURST/releases/download/v0.99.8/burst_linux_DB15
+  - chmod 755 burst_linux_DB15
+  - mv burst_linux_DB15 $CONDA_PREFIX/bin/burst15
+  # making sure we have the correct software versions
+  - woltka_version=`woltka --version`
+  - bowtie2_version=`bowtie2 --version`
+  - burst15_version=`burst15 -h | grep BURST`
+  - utree_version=`(utree-search_gg || true)`
+  - if [[ $woltka_version != *"1.0.8"* ]]; then echo "wrong woltka version", $woltka_version; exit 1; fi
+  - if [[ $bowtie2_version != *"2.4.1"* ]]; then echo "wrong bowtie2 version", $bowtie2_version; exit 1; fi
+  - if [[ $burst15_version != *"0.99.8"* ]]; then echo "wrong burst15 version", $burst15_version; exit 1; fi
+  - if [[ $utree_version != *"2.0RF"* ]]; then echo "wrong utree version", $utree_version; exit 1; fi
+  - configure_woltka --env-script "source activate qp-woltka" --server-cert $QIITA_SERVER_CERT
+before_script:
+  - source activate qiita
+  - qiita plugins update
+  - supervisord -c ${PWD}/qiita-dev/qiita_pet/supervisor_example.conf
+  - sleep 10 # give enough time to the webserver to start
+  - cat /tmp/supervisord.log
+script:
+  - source activate qp-woltka
+  - travis_wait 40 nosetests $COVER_PACKAGE --with-doctest --with-coverage --with-timer -vv --cover-package=$COVER_PACKAGE
+  - flake8 qp_woltka setup.py scripts
+addons:
+  postgresql: "9.5"
+services:
+  - redis-server
+  - postgresql
+after_success:
+  - codecov
+  - qiita-env drop
+after_failure:
+  - kill $QIITA_PID
+  - qiita-env drop
