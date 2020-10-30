@@ -467,7 +467,7 @@ class WoltkaTests(PluginTestCase):
 
         self.params['input'] = aid
         data = {'user': 'demo@microbio.me',
-                'command': dumps(['qp-meta', '2020.11', 'meta v0.1.1']),
+                'command': dumps(['qp-meta', '2020.11', 'Woltka v0.1.1']),
                 'status': 'running',
                 'parameters': dumps(self.params)}
         jid = self.qclient.post('/apitest/processing_job/', data=data)['job']
@@ -524,7 +524,7 @@ class WoltkaTests(PluginTestCase):
         self.params['input'] = aid
         self.params['Database'] = join(self.db_path, 'wol')
         data = {'user': 'demo@microbio.me',
-                'command': dumps(['qp-meta', '2020.11', 'meta v0.1.1']),
+                'command': dumps(['qp-meta', '2020.11', 'Woltka v0.1.1']),
                 'status': 'running',
                 'parameters': dumps(self.params)}
         jid = self.qclient.post('/apitest/processing_job/', data=data)['job']
