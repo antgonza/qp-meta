@@ -15,12 +15,12 @@ from json import dumps
 from functools import partial
 import os
 from qiita_client.testing import PluginTestCase
-from qp_woltka import plugin
-from qp_woltka.filter.filter import (
+from qp_meta import plugin
+from qp_meta.filter.filter import (
     generate_filter_commands, filter)
-from qp_woltka.filter.utils import (
+from qp_meta.filter.utils import (
     get_dbs, get_dbs_list, generate_filter_dflt_params)
-from qp_woltka.utils import (_format_params, _per_sample_ainfo)
+from qp_meta.utils import (_format_params, _per_sample_ainfo)
 
 
 BOWTIE2_PARAMS = {
@@ -156,7 +156,7 @@ class QC_FilterTests(PluginTestCase):
 
         self.params['input'] = aid
         data = {'user': 'demo@microbio.me',
-                'command': dumps(['qp-woltka', '2020.11', 'QC_Filter']),
+                'command': dumps(['qp-meta', '2020.11', 'QC_Filter']),
                 'status': 'running',
                 'parameters': dumps(self.params)}
         jid = self.qclient.post('/apitest/processing_job/', data=data)['job']

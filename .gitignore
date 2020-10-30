@@ -92,9 +92,9 @@ ENV/
 ._bowtie2
 .adapters
 
-# woltka DB
-qp_woltka/woltka/databases/rep82/
-qp_woltka/woltka/databases/wol/
+# meta DB
+qp_meta/meta/databases/rep82/
+qp_meta/meta/databases/wol/
 
 # Redis
 dump.rdb

@@ -6,14 +6,14 @@
 # The full license is in the file LICENSE, distributed with this software.
 # -----------------------------------------------------------------------------
 from os.path import join
-from .utils import readfq, import_woltka_biom
-from qp_woltka.utils import (make_read_pairs_per_sample, _run_commands)
+from .utils import readfq, import_meta_biom
+from qp_meta.utils import (make_read_pairs_per_sample, _run_commands)
 import gzip
 from qiita_client import ArtifactInfo
 from qiita_client.util import system_call
 from biom import util
 
-woltka_PARAMS = {
+meta_PARAMS = {
     'Database': 'database', 'Aligner tool': 'aligner',
     'Number of threads': 'threads', 'Capitalist': 'capitalist',
     'Percent identity': 'percent_id'}
@@ -60,10 +60,10 @@ def _format_params(parameters, func_params):
     return params
 
 
-def generate_woltka_align_commands(input_fp, out_dir, parameters):
+def generate_meta_align_commands(input_fp, out_dir, parameters):
     cmds = []
     cmds.append(
-        'woltka align --aligner {aligner} --threads {threads} '
+        'meta align --aligner {aligner} --threads {threads} '
         '--database {database} --input {input} --output {output} '
         '--percent_id {percent_id}'.format(
             aligner=parameters['aligner'],
@@ -76,14 +76,14 @@ def generate_woltka_align_commands(input_fp, out_dir, parameters):
     return cmds
 
 
-def generate_woltka_assign_taxonomy_commands(out_dir, parameters):
+def generate_meta_assign_taxonomy_commands(out_dir, parameters):
     cmds = []
     ext = ALN2EXT[parameters['aligner']]
     output_fp = join(out_dir, 'profile.tsv')
     capitalist = ('--capitalist' if parameters['capitalist']
                   else '--no-capitalist')
     cmds.append(
-        'woltka assign_taxonomy '
+        'meta assign_taxonomy '
         '--aligner {aligner} '
         '{capitalist} '
         '--database {database} '
@@ -98,12 +98,12 @@ def generate_woltka_assign_taxonomy_commands(out_dir, parameters):
     return cmds, output_fp
 
 
-def generate_woltka_functional_commands(profile_dir, out_dir,
+def generate_meta_functional_commands(profile_dir, out_dir,
                                         parameters, sel_level):
     cmds = []
     output = join(out_dir, 'functional')
     cmds.append(
-        'woltka functional '
+        'meta functional '
         '--database {database} '
         '--input {input} '
         '--output {output} '
@@ -116,12 +116,12 @@ def generate_woltka_functional_commands(profile_dir, out_dir,
     return cmds, output
 
 
-def generate_woltka_redist_commands(profile_dir, out_dir,
+def generate_meta_redist_commands(profile_dir, out_dir,
                                     parameters, sel_level):
     cmds = []
     output = join(out_dir, 'profile.redist.%s.tsv' % sel_level)
     cmds.append(
-        'woltka redistribute '
+        'meta redistribute '
         '--database {database} '
         '--level {level} '
         '--input {input} '
@@ -134,23 +134,23 @@ def generate_woltka_redist_commands(profile_dir, out_dir,
     return cmds, output
 
 
-def run_woltka_to_biom(in_fp, biom_in, out_dir, level, version='alignment'):
+def run_meta_to_biom(in_fp, biom_in, out_dir, level, version='alignment'):
     if version in ('redist', 'alignment'):
         output_fp = join(out_dir, 'otu_table.%s.%s.biom'
                          % (version, level))
     else:
         output_fp = join(out_dir, 'otu_table.%s.%s.%s.biom'
                          % (version, level, biom_in[0]))
-    tb = import_woltka_biom(in_fp, biom_in[1],
+    tb = import_meta_biom(in_fp, biom_in[1],
                             biom_in[2], biom_in[3])
     with util.biom_open(output_fp, 'w') as f:
-        tb.to_hdf5(f, "woltka")
+        tb.to_hdf5(f, "meta")
 
     return output_fp
 
 
-def woltka(qclient, job_id, parameters, out_dir):
-    """Run woltka with the given parameters
+def meta(qclient, job_id, parameters, out_dir):
+    """Run meta with the given parameters
 
     Parameters
     ----------
@@ -184,7 +184,7 @@ def woltka(qclient, job_id, parameters, out_dir):
 
     # Step 2 converting to fna
     qclient.update_job_step(
-        job_id, "Step 2 of 7: Converting to FNA for woltka")
+        job_id, "Step 2 of 7: Converting to FNA for meta")
 
     rs = fps['raw_reverse_seqs'] if 'raw_reverse_seqs' in fps else []
     samples = make_read_pairs_per_sample(
@@ -194,25 +194,25 @@ def woltka(qclient, job_id, parameters, out_dir):
     comb_fp = generate_fna_file(out_dir, samples)
 
     # Formatting parameters
-    parameters = _format_params(parameters, woltka_PARAMS)
+    parameters = _format_params(parameters, meta_PARAMS)
 
     # Step 3 align
-    align_cmd = generate_woltka_align_commands(
+    align_cmd = generate_meta_align_commands(
         comb_fp, out_dir, parameters)
-    sys_msg = "Step 3 of 7: Aligning FNA with woltka (%d/{0})".format(
+    sys_msg = "Step 3 of 7: Aligning FNA with meta (%d/{0})".format(
         len(align_cmd))
     success, msg = _run_commands(
-        qclient, job_id, align_cmd, sys_msg, 'woltka Align')
+        qclient, job_id, align_cmd, sys_msg, 'meta Align')
 
     if not success:
         return False, None, msg
 
     # Step 4 taxonomic profile
-    sys_msg = "Step 4 of 7: Taxonomic profile with woltka (%d/{0})"
-    assign_cmd, profile_fp = generate_woltka_assign_taxonomy_commands(
+    sys_msg = "Step 4 of 7: Taxonomic profile with meta (%d/{0})"
+    assign_cmd, profile_fp = generate_meta_assign_taxonomy_commands(
         out_dir, parameters)
     success, msg = _run_commands(
-        qclient, job_id, assign_cmd, sys_msg, 'woltka taxonomy assignment')
+        qclient, job_id, assign_cmd, sys_msg, 'meta taxonomy assignment')
     if not success:
         return False, None, msg
 
@@ -227,54 +227,54 @@ def woltka(qclient, job_id, parameters, out_dir):
                      "\n\nCommand run was:\n%s"
                      % (sys_msg, std_out, std_err, xz_cmd))
         return False, None, error_msg
-    output = run_woltka_to_biom(profile_fp, [None, None, None, True],
+    output = run_meta_to_biom(profile_fp, [None, None, None, True],
                                 out_dir, 'profile')
 
     alignment_fp_xz = '%s.xz' % alignment_fp
-    ainfo = [ArtifactInfo('woltka Alignment Profile', 'BIOM',
+    ainfo = [ArtifactInfo('meta Alignment Profile', 'BIOM',
                           [(output, 'biom'),
                            (alignment_fp_xz, 'log')])]
 
     # Step 5 redistribute profile
-    sys_msg = "Step 6 of 7: Redistributed profile with woltka (%d/{0})"
+    sys_msg = "Step 6 of 7: Redistributed profile with meta (%d/{0})"
     levels = ['phylum', 'genus', 'species']
     redist_fps = []
     for level in levels:
-        redist_cmd, output = generate_woltka_redist_commands(
+        redist_cmd, output = generate_meta_redist_commands(
             profile_fp, out_dir, parameters, level)
         redist_fps.append(output)
         success, msg = _run_commands(
-            qclient, job_id, redist_cmd, sys_msg, 'woltka redistribute')
+            qclient, job_id, redist_cmd, sys_msg, 'meta redistribute')
         if not success:
             return False, None, msg
     # Converting redistributed files to biom
     for redist_fp, level in zip(redist_fps, levels):
         biom_in = ["redist", None, '', True]
-        output = run_woltka_to_biom(
+        output = run_meta_to_biom(
             redist_fp, biom_in, out_dir, level, 'redist')
         aname = 'Taxonomic Predictions - %s' % level
         ainfo.append(ArtifactInfo(aname, 'BIOM', [(output, 'biom')]))
 
-    # Woltka only works with WOL databases
+    # meta only works with WOL databases
     if 'wol' in parameters['database']:
         sys_msg = "Step 7 of 7: Wolka gOTU and per-gene tables (%d/{0})"
-        per_genome_fp = join(out_dir, 'woltka_per_genome.biom')
-        per_gene_fp = join(out_dir, 'woltka_per_gene.biom')
+        per_genome_fp = join(out_dir, 'meta_per_genome.biom')
+        per_gene_fp = join(out_dir, 'meta_per_gene.biom')
         coord_fp = join(parameters['database'], 'WoLr1.coords')
         commands = [
-            'woltka classify -i %s -o %s' % (alignment_fp_xz, per_genome_fp),
-            'woltka classify -i %s -c %s -o %s' % (
+            'meta classify -i %s -o %s' % (alignment_fp_xz, per_genome_fp),
+            'meta classify -i %s -c %s -o %s' % (
                 alignment_fp_xz, coord_fp, per_gene_fp)]
 
         success, msg = _run_commands(
-            qclient, job_id, commands, sys_msg, 'Woltka')
+            qclient, job_id, commands, sys_msg, 'meta')
         if not success:
             return False, None, msg
 
         ainfo.extend([
-            ArtifactInfo('Woltka - per genome', 'BIOM', [
+            ArtifactInfo('meta - per genome', 'BIOM', [
                 (per_genome_fp, 'biom')]),
-            ArtifactInfo('Woltka - per gene', 'BIOM', [
+            ArtifactInfo('meta - per gene', 'BIOM', [
                 (per_gene_fp, 'biom')])])
 
     return True, ainfo, ""
@@ -285,19 +285,19 @@ def woltka(qclient, job_id, parameters, out_dir):
 #
 
 # # Step 6 functional profile
-# sys_msg = "Step 6 of 7: Functional profile with woltka (%d/{0})"
+# sys_msg = "Step 6 of 7: Functional profile with meta (%d/{0})"
 # levels = ['species']
 # func_fp = ''
 # for level in levels:
-#     func_cmd, output = generate_woltka_functional_commands(
+#     func_cmd, output = generate_meta_functional_commands(
 #         profile_fp, out_dir, parameters, level)
 #     func_fp = output
 #     success, msg = _run_commands(
-#         qclient, job_id, func_cmd, sys_msg, 'woltka functional')
+#         qclient, job_id, func_cmd, sys_msg, 'meta functional')
 #     if not success:
 #         return False, None, msg
 # # Coverting funcitonal files to biom
-# func_db_fp = woltka_db_functional_parser(parameters['database'])
+# func_db_fp = meta_db_functional_parser(parameters['database'])
 # for level in levels:
 #     func_to_biom_fps = [
 #         ["kegg.modules.coverage", func_db_fp['module'],
@@ -312,7 +312,7 @@ def woltka(qclient, job_id, parameters, out_dir):
 #     for biom_in in func_to_biom_fps:
 #         biom_in_fp = join(func_fp, "profile.%s.%s.txt"
 #                           % (level, biom_in[0]))
-#         output = run_woltka_to_biom(biom_in_fp, biom_in, out_dir,
+#         output = run_meta_to_biom(biom_in_fp, biom_in, out_dir,
 #                                     level, 'func')
 #         if biom_in[0] == 'kegg.modules.coverage':
 #             atype = 'KEGG Modules Coverage'

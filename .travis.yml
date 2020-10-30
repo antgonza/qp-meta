@@ -2,7 +2,7 @@ dist: xenial
 language: python
 sudo: false
 env:
-  - PYTHON_VERSION=3.6 COVER_PACKAGE="qp_woltka/filter qp_woltka/trim qp_woltka/woltka qp_woltka/sortmerna"
+  - PYTHON_VERSION=3.6 COVER_PACKAGE="qp_meta/filter qp_meta/trim qp_meta/meta qp_meta/sortmerna"
 before_install:
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh
@@ -28,30 +28,30 @@ install:
   - nginx -c ${PWD}/qiita-dev/qiita_pet/nginx_example.conf
   - qiita-env make --no-load-ontologies
   - source deactivate
-  # installing qp-woltka
-  - conda create --yes -n qp-woltka biom-format bowtie2 sortmerna=2.1b samtools pigz
-  - source activate qp-woltka
+  # installing qp-meta
+  - conda create --yes -n qp-meta biom-format bowtie2 sortmerna=2.1b samtools pigz
+  - source activate qp-meta
   - pip install -U pip pip nose flake8
   - pip install sphinx sphinx-bootstrap-theme nose-timer codecov biopython
   - pip install https://github.com/qiita-spots/qiita_client/archive/master.zip
   - pip install atropos
   - export QIITA_SERVER_CERT=$HOME/miniconda3/envs/qiita/lib/python3.6/site-packages/qiita_core/support_files/server.crt
   - pip install .
-  - export QC_FILTER_DB_DP=$PWD/qp_woltka/filter/databases/
-  - export QC_woltka_DB_DP=$PWD/qp_woltka/woltka/databases/
-  - export QC_SORTMERNA_DB_DP=$PWD/qp_woltka/sortmerna/databases/rRNA_databases/
-  - for file in $(ls $QC_woltka_DB_DP); do tar xvjf $QC_woltka_DB_DP$file -C $QC_woltka_DB_DP; done
+  - export QC_FILTER_DB_DP=$PWD/qp_meta/filter/databases/
+  - export QC_meta_DB_DP=$PWD/qp_meta/meta/databases/
+  - export QC_SORTMERNA_DB_DP=$PWD/qp_meta/sortmerna/databases/rRNA_databases/
+  - for file in $(ls $QC_meta_DB_DP); do tar xvjf $QC_meta_DB_DP$file -C $QC_meta_DB_DP; done
   # the min WoL coords file needs to be renamed WoLr1.coords
-  - mv ${QC_woltka_DB_DP}/wol/WoLmin.coords ${QC_woltka_DB_DP}/wol/WoLr1.coords
+  - mv ${QC_meta_DB_DP}/wol/WoLmin.coords ${QC_meta_DB_DP}/wol/WoLr1.coords
   - pushd $QC_SORTMERNA_DB_DP
   - for file in $(ls); do gunzip $file; done
   - popd
   # making sure we have the correct software versions
-  - woltka_version=`woltka --version`
+  - meta_version=`meta --version`
   - bowtie2_version=`bowtie2 --version`
-  - if [[ $woltka_version != *"0.1.1"* ]]; then echo "wrong Woltka version", $woltka_version; exit 1; fi
+  - if [[ $meta_version != *"0.1.1"* ]]; then echo "wrong meta version", $meta_version; exit 1; fi
   - if [[ $bowtie2_version != *"2.4.2"* ]]; then echo "wrong bowtie2 version", $bowtie2_version; exit 1; fi
-  - configure_woltka --env-script "source activate qp-woltka" --server-cert $QIITA_SERVER_CERT
+  - configure_meta --env-script "source activate qp-meta" --server-cert $QIITA_SERVER_CERT
 before_script:
   - source activate qiita
   - qiita plugins update
@@ -59,9 +59,9 @@ before_script:
   - sleep 10 # give enough time to the webserver to start
   - cat /tmp/supervisord.log
 script:
-  - source activate qp-woltka
-  - travis_wait 40 nosetests $COVER_PACKAGE --with-doctest --with-coverage --with-timer -vv --cover-package=$COVER_PACKAGE -e 'test_wol_bt2' -e 'test_woltka_bt2'
-  - flake8 qp_woltka setup.py scripts
+  - source activate qp-meta
+  - travis_wait 40 nosetests $COVER_PACKAGE --with-doctest --with-coverage --with-timer -vv --cover-package=$COVER_PACKAGE -e 'test_wol_bt2' -e 'test_meta_bt2'
+  - flake8 qp_meta setup.py scripts
 addons:
   postgresql: "9.5"
 services:

@@ -33,28 +33,28 @@ with open('README.rst') as f:
 
 classifiers = [s.strip() for s in classes.split('\n') if s]
 
-setup(name='qp-woltka',
+setup(name='qp-meta',
       version=__version__,
       long_description=long_description,
       license="BSD",
-      description='Qiita Plugin: woltka',
+      description='Qiita Plugin: meta',
       author="Qiita development team",
       author_email="qiita.help@gmail.com",
       url='https://github.com/biocore/qiita',
       test_suite='nose.collector',
-      packages=['qp_woltka', 'qp_woltka/trim',
-                'qp_woltka/filter', 'qp_woltka/woltka',
-                'qp_woltka/sortmerna'],
+      packages=['qp_meta', 'qp_meta/trim',
+                'qp_meta/filter', 'qp_meta/meta',
+                'qp_meta/sortmerna'],
       package_data={
-        'qp_woltka': [
+        'qp_meta': [
             'support_files/config_file.cfg',
-            'woltka/databases/*'],
-        'sortmerna': ['qp_woltka/sortmerna/databases/*']},
-      scripts=['scripts/configure_woltka', 'scripts/start_woltka'],
+            'meta/databases/*'],
+        'sortmerna': ['qp_meta/sortmerna/databases/*']},
+      scripts=['scripts/configure_meta', 'scripts/start_meta'],
       extras_require={'test': ["nose >= 0.10.1", "pep8"]},
       install_requires=['click >= 3.3', 'future', 'pandas >= 0.15',
                         'h5py >= 2.3.1', 'biom-format',
-                        'woltka @ https://github.com/'
-                        'qiyunzhu/woltka/archive/master.zip'],
+                        'meta @ https://github.com/'
+                        'qiyunzhu/meta/archive/master.zip'],
       classifiers=classifiers
       )

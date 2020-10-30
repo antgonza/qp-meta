@@ -10,7 +10,7 @@
 
 import click
 
-from qp_woltka import plugin
+from qp_meta import plugin
 
 
 @click.command()
