@@ -10,7 +10,6 @@ from qiita_client import QiitaPlugin
 
 from .trim import trim_cmd
 from .filter import filter_cmd
-from .meta import meta_cmd
 from .sortmerna import sortmerna_cmd
 
 

@@ -237,9 +237,9 @@ class metaTests(PluginTestCase):
 
     def test_import_meta_biom(self):
         meta_table = ('#OTU ID\t1450\t2563\n'
-                        'k__Archaea\t26\t25\n'
-                        'k__Archaea;p__Crenarchaeota\t3\t5\n'
-                        'k__Archaea;p__Crenarchaeota;c__Thermoprotei\t1\t25\n')
+                      'k__Archaea\t26\t25\n'
+                      'k__Archaea;p__Crenarchaeota\t3\t5\n'
+                      'k__Archaea;p__Crenarchaeota;c__Thermoprotei\t1\t25\n')
 
         exp_biom = Table(np.array([[26, 25],
                                    [3, 5],

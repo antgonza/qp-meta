@@ -141,7 +141,7 @@ def meta_parse_pathway_table(f):
 
 
 def import_meta_biom(f, annotation_table=None,
-                       annotation_type=None, names_to_taxonomy=False):
+                     annotation_type=None, names_to_taxonomy=False):
     import_funcs = {'module': meta_parse_module_table,
                     'pathway': meta_parse_pathway_table,
                     'enzyme': meta_parse_enzyme_table}
