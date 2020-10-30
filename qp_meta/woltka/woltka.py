@@ -193,7 +193,7 @@ def woltka(qclient, job_id, parameters, out_dir):
     comb_fp = generate_fna_file(out_dir, samples)
 
     # Formatting parameters
-    parameters = _format_params(parameters, woltka_PARAMS)
+    parameters = _format_params(parameters, WOLTKA_PARAMS)
 
     # Step 3 align
     align_cmd = generate_woltka_align_commands(
