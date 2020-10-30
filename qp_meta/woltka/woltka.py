@@ -13,7 +13,7 @@ from qiita_client import ArtifactInfo
 from qiita_client.util import system_call
 from biom import util
 
-woltka_PARAMS = {
+WOLTKA_PARAMS = {
     'Database': 'database', 'Aligner tool': 'aligner',
     'Number of threads': 'threads', 'Capitalist': 'capitalist',
     'Percent identity': 'percent_id'}

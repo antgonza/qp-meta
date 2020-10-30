@@ -7,7 +7,7 @@
 # -----------------------------------------------------------------------------
 
 from qiita_client import QiitaCommand
-from .meta import woltka
+from .woltka import woltka
 from .utils import (generate_woltka_dflt_params, get_dbs_list)
 from os import environ
 
