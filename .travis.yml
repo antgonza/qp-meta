@@ -2,7 +2,7 @@ dist: xenial
 language: python
 sudo: false
 env:
-  - PYTHON_VERSION=3.6 COVER_PACKAGE="qp_meta/filter qp_meta/trim qp_meta/meta qp_meta/sortmerna"
+  - PYTHON_VERSION=3.6 COVER_PACKAGE="qp_meta/filter qp_meta/trim qp_meta/woltka qp_meta/sortmerna"
 before_install:
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh

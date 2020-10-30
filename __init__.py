@@ -10,7 +10,6 @@ from qiita_client import QiitaPlugin
 
 from .trim import trim_cmd
 from .filter import filter_cmd
-from .meta import meta_cmd
 from .sortmerna import sortmerna_cmd
 
 
@@ -20,5 +19,4 @@ plugin = QiitaPlugin(
 
 plugin.register_command(trim_cmd)
 plugin.register_command(filter_cmd)
-plugin.register_command(meta_cmd)
 plugin.register_command(sortmerna_cmd)
