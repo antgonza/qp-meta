@@ -43,9 +43,9 @@ def get_dbs_list(db_folder):
     return(dbs_formatted)
 
 
-def generate_meta_dflt_params():
+def generate_woltka_dflt_params():
     dflt_param_set = {}
-    db_parent_path = os.environ["QC_meta_DB_DP"]
+    db_parent_path = os.environ["QC_WOLTKA_DB_DP"]
     # Get a the databases available and the database name
     dbs = get_dbs(db_parent_path)
     # Create dict with command options per database
@@ -94,7 +94,7 @@ def readfq(fp):  # this is a generator function
                 break
 
 
-def meta_db_functional_parser(db_path):
+def woltka_db_functional_parser(db_path):
     # Metadata file path
     md_fp = join(db_path, 'metadata.yaml')
     metadata = pd.read_csv(md_fp, sep=':', index_col=0)
@@ -107,7 +107,7 @@ def meta_db_functional_parser(db_path):
     return fp_array
 
 
-def meta_parse_enzyme_table(f):
+def woltka_parse_enzyme_table(f):
     md = pd.read_csv(
         f, sep='\t', header=None, error_bad_lines=False, warn_bad_lines=False)
     md.set_index(0, inplace=True)
@@ -117,7 +117,7 @@ def meta_parse_enzyme_table(f):
     return(metadata)
 
 
-def meta_parse_module_table(f):
+def woltka_parse_module_table(f):
     md = pd.read_csv(
         f, sep='\t', header=None, error_bad_lines=False, warn_bad_lines=False)
     metadata = {}
@@ -129,7 +129,7 @@ def meta_parse_module_table(f):
     return(metadata)
 
 
-def meta_parse_pathway_table(f):
+def woltka_parse_pathway_table(f):
     md = pd.read_csv(
         f, sep='\t', header=None, error_bad_lines=False, warn_bad_lines=False)
     metadata = {}
@@ -140,11 +140,11 @@ def meta_parse_pathway_table(f):
     return(metadata)
 
 
-def import_meta_biom(f, annotation_table=None,
-                     annotation_type=None, names_to_taxonomy=False):
-    import_funcs = {'module': meta_parse_module_table,
-                    'pathway': meta_parse_pathway_table,
-                    'enzyme': meta_parse_enzyme_table}
+def import_woltka_biom(f, annotation_table=None,
+                       annotation_type=None, names_to_taxonomy=False):
+    import_funcs = {'module': woltka_parse_module_table,
+                    'pathway': woltka_parse_pathway_table,
+                    'enzyme': woltka_parse_enzyme_table}
 
     table = pd.read_csv(f, sep='\t', index_col=0)
 

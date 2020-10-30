@@ -7,15 +7,15 @@
 # -----------------------------------------------------------------------------
 
 from qiita_client import QiitaCommand
-from .meta import meta
-from .utils import (generate_meta_dflt_params, get_dbs_list)
+from .meta import woltka
+from .utils import (generate_woltka_dflt_params, get_dbs_list)
 from os import environ
 
 
-__all__ = ['meta']
+__all__ = ['woltka']
 
 # Define the meta command
-default_db_list = get_dbs_list(environ["QC_meta_DB_DP"])
+default_db_list = get_dbs_list(environ["QC_WOLTKA_DB_DP"])
 req_params = {'input': ('artifact', ['per_sample_FASTQ'])}
 opt_params = {
     # database
@@ -31,15 +31,15 @@ opt_params = {
     'Percent identity': ['float', '0.95'],
     }
 outputs = {
-    'meta Alignment Profile': 'BIOM',
+    'Alignment Profile': 'BIOM',
     'Taxonomic Predictions - phylum': 'BIOM',
     'Taxonomic Predictions - genus': 'BIOM',
     'Taxonomic Predictions - species': 'BIOM',
-    'meta - per genome': 'BIOM',
-    'meta - per gene': 'BIOM',
+    'Woltka - per genome': 'BIOM',
+    'Woltka - per gene': 'BIOM',
     }
-dflt_param_set = generate_meta_dflt_params()
+dflt_param_set = generate_woltka_dflt_params()
 
-meta_cmd = QiitaCommand(
-    'meta v0.1.1', "Functional and Taxonomic Predictions", meta,
+woltka_cmd = QiitaCommand(
+    'Woltka v0.1.1', "Functional and Taxonomic Predictions", woltka,
     req_params, opt_params, outputs, dflt_param_set)
