@@ -7,7 +7,7 @@
 # -----------------------------------------------------------------------------
 from os.path import join
 from .utils import readfq, import_woltka_biom
-from qp_woltka.utils import (make_read_pairs_per_sample, _run_commands)
+from qp_meta.utils import (make_read_pairs_per_sample, _run_commands)
 import gzip
 from qiita_client import ArtifactInfo
 from qiita_client.util import system_call
