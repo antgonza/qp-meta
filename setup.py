@@ -43,18 +43,15 @@ setup(name='qp-meta',
       url='https://github.com/biocore/qiita',
       test_suite='nose.collector',
       packages=['qp_meta', 'qp_meta/trim',
-                'qp_meta/filter', 'qp_meta/woltka',
+                'qp_meta/filter',
                 'qp_meta/sortmerna'],
       package_data={
         'qp_meta': [
-            'support_files/config_file.cfg',
-            'woltka/databases/*'],
+            'support_files/config_file.cfg'],
         'sortmerna': ['qp_meta/sortmerna/databases/*']},
       scripts=['scripts/configure_meta', 'scripts/start_meta'],
       extras_require={'test': ["nose >= 0.10.1", "pep8"]},
       install_requires=['click >= 3.3', 'future', 'pandas >= 0.15',
-                        'h5py >= 2.3.1', 'biom-format',
-                        'woltka @ https://github.com/'
-                        'qiyunzhu/woltka/archive/master.zip'],
+                        'h5py >= 2.3.1', 'biom-format'],
       classifiers=classifiers
       )

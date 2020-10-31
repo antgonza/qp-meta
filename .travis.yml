@@ -2,7 +2,7 @@ dist: xenial
 language: python
 sudo: false
 env:
-  - PYTHON_VERSION=3.6 COVER_PACKAGE="qp_meta/filter qp_meta/trim qp_meta/woltka qp_meta/sortmerna"
+  - PYTHON_VERSION=3.6 COVER_PACKAGE="qp_meta/filter qp_meta/trim qp_meta/sortmerna"
 before_install:
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh
@@ -38,18 +38,12 @@ install:
   - export QIITA_SERVER_CERT=$HOME/miniconda3/envs/qiita/lib/python3.6/site-packages/qiita_core/support_files/server.crt
   - pip install .
   - export QC_FILTER_DB_DP=$PWD/qp_meta/filter/databases/
-  - export QC_WOLTKA_DB_DP=$PWD/qp_meta/woltka/databases/
   - export QC_SORTMERNA_DB_DP=$PWD/qp_meta/sortmerna/databases/rRNA_databases/
-  - for file in $(ls $QC_WOLTKA_DB_DP); do tar xvjf $QC_WOLTKA_DB_DP$file -C $QC_WOLTKA_DB_DP; done
-  # the min WoL coords file needs to be renamed WoLr1.coords
-  - mv ${QC_WOLTKA_DB_DP}/wol/WoLmin.coords ${QC_WOLTKA_DB_DP}/wol/WoLr1.coords
   - pushd $QC_SORTMERNA_DB_DP
   - for file in $(ls); do gunzip $file; done
   - popd
   # making sure we have the correct software versions
-  - woltka_version=`woltka --version`
   - bowtie2_version=`bowtie2 --version`
-  - if [[ $woltka_version != *"0.1.1"* ]]; then echo "wrong woltka version", $woltka_version; exit 1; fi
   - if [[ $bowtie2_version != *"2.4.2"* ]]; then echo "wrong bowtie2 version", $bowtie2_version; exit 1; fi
   - configure_meta --env-script "source activate qp-meta" --server-cert $QIITA_SERVER_CERT
 before_script:
@@ -60,7 +54,7 @@ before_script:
   - cat /tmp/supervisord.log
 script:
   - source activate qp-meta
-  - travis_wait 40 nosetests $COVER_PACKAGE --with-doctest --with-coverage --with-timer -vv --cover-package=$COVER_PACKAGE -e 'test_wol_bt2' -e 'test_woltka_bt2'
+  - travis_wait 40 nosetests $COVER_PACKAGE --with-doctest --with-coverage --with-timer -vv --cover-package=$COVER_PACKAGE
   - flake8 qp_meta setup.py scripts
 addons:
   postgresql: "9.5"

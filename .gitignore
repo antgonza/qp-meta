@@ -93,8 +93,7 @@ ENV/
 .adapters
 
 # meta DB
-qp_meta/woltka/databases/rep82/
-qp_meta/woltka/databases/wol/
+qp_meta/sortmerna/databases/
 
 # Redis
 dump.rdb
