@@ -8,7 +8,7 @@
 
 # ------------------------------------------------------------------------------
 # This file contains functions related to generating default parameters for
-# woltka
+# meta
 # ------------------------------------------------------------------------------
 
 import os
@@ -45,7 +45,7 @@ def get_dbs_list(db_folder):
 
 def generate_woltka_dflt_params():
     dflt_param_set = {}
-    db_parent_path = os.environ["QC_woltka_DB_DP"]
+    db_parent_path = os.environ["QC_WOLTKA_DB_DP"]
     # Get a the databases available and the database name
     dbs = get_dbs(db_parent_path)
     # Create dict with command options per database

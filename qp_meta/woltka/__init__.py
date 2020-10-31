@@ -14,8 +14,8 @@ from os import environ
 
 __all__ = ['woltka']
 
-# Define the woltka command
-default_db_list = get_dbs_list(environ["QC_woltka_DB_DP"])
+# Define the meta command
+default_db_list = get_dbs_list(environ["QC_WOLTKA_DB_DP"])
 req_params = {'input': ('artifact', ['per_sample_FASTQ'])}
 opt_params = {
     # database
@@ -31,7 +31,7 @@ opt_params = {
     'Percent identity': ['float', '0.95'],
     }
 outputs = {
-    'woltka Alignment Profile': 'BIOM',
+    'Alignment Profile': 'BIOM',
     'Taxonomic Predictions - phylum': 'BIOM',
     'Taxonomic Predictions - genus': 'BIOM',
     'Taxonomic Predictions - species': 'BIOM',

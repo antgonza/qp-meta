@@ -7,13 +7,13 @@
 # -----------------------------------------------------------------------------
 from os.path import join
 from .utils import readfq, import_woltka_biom
-from qp_woltka.utils import (make_read_pairs_per_sample, _run_commands)
+from qp_meta.utils import (make_read_pairs_per_sample, _run_commands)
 import gzip
 from qiita_client import ArtifactInfo
 from qiita_client.util import system_call
 from biom import util
 
-woltka_PARAMS = {
+WOLTKA_PARAMS = {
     'Database': 'database', 'Aligner tool': 'aligner',
     'Number of threads': 'threads', 'Capitalist': 'capitalist',
     'Percent identity': 'percent_id'}
@@ -139,10 +139,9 @@ def run_woltka_to_biom(in_fp, biom_in, out_dir, level, version='alignment'):
         output_fp = join(out_dir, 'otu_table.%s.%s.biom'
                          % (version, level))
     else:
-        output_fp = join(out_dir, 'otu_table.%s.%s.%s.biom'
-                         % (version, level, biom_in[0]))
-    tb = import_woltka_biom(in_fp, biom_in[1],
-                            biom_in[2], biom_in[3])
+        output_fp = join(out_dir, 'otu_table.%s.%s.%s.biom' % (
+            version, level, biom_in[0]))
+    tb = import_woltka_biom(in_fp, biom_in[1], biom_in[2], biom_in[3])
     with util.biom_open(output_fp, 'w') as f:
         tb.to_hdf5(f, "woltka")
 
@@ -177,7 +176,7 @@ def woltka(qclient, job_id, parameters, out_dir):
     artifact_info = qclient.get("/qiita_db/artifacts/%s/" % artifact_id)
     fps = artifact_info['files']
 
-    # Get the artifact metadata
+    # Get the artifact woltkadata
     prep_info = qclient.get('/qiita_db/prep_template/%s/'
                             % artifact_info['prep_information'][0])
     qiime_map = prep_info['qiime-map']
@@ -194,7 +193,7 @@ def woltka(qclient, job_id, parameters, out_dir):
     comb_fp = generate_fna_file(out_dir, samples)
 
     # Formatting parameters
-    parameters = _format_params(parameters, woltka_PARAMS)
+    parameters = _format_params(parameters, WOLTKA_PARAMS)
 
     # Step 3 align
     align_cmd = generate_woltka_align_commands(
@@ -255,7 +254,7 @@ def woltka(qclient, job_id, parameters, out_dir):
         aname = 'Taxonomic Predictions - %s' % level
         ainfo.append(ArtifactInfo(aname, 'BIOM', [(output, 'biom')]))
 
-    # Woltka only works with WOL databases
+    # woltka only works with WOL databases
     if 'wol' in parameters['database']:
         sys_msg = "Step 7 of 7: Wolka gOTU and per-gene tables (%d/{0})"
         per_genome_fp = join(out_dir, 'woltka_per_genome.biom')
@@ -267,67 +266,14 @@ def woltka(qclient, job_id, parameters, out_dir):
                 alignment_fp_xz, coord_fp, per_gene_fp)]
 
         success, msg = _run_commands(
-            qclient, job_id, commands, sys_msg, 'Woltka')
+            qclient, job_id, commands, sys_msg, 'woltka')
         if not success:
             return False, None, msg
 
         ainfo.extend([
-            ArtifactInfo('Woltka - per genome', 'BIOM', [
+            ArtifactInfo('woltka - per genome', 'BIOM', [
                 (per_genome_fp, 'biom')]),
-            ArtifactInfo('Woltka - per gene', 'BIOM', [
+            ArtifactInfo('woltka - per gene', 'BIOM', [
                 (per_gene_fp, 'biom')])])
 
     return True, ainfo, ""
-
-#
-# This code is not currently needed but it will be used for analysis, so
-# leaving here to avoid having to rewrite it
-#
-
-# # Step 6 functional profile
-# sys_msg = "Step 6 of 7: Functional profile with woltka (%d/{0})"
-# levels = ['species']
-# func_fp = ''
-# for level in levels:
-#     func_cmd, output = generate_woltka_functional_commands(
-#         profile_fp, out_dir, parameters, level)
-#     func_fp = output
-#     success, msg = _run_commands(
-#         qclient, job_id, func_cmd, sys_msg, 'woltka functional')
-#     if not success:
-#         return False, None, msg
-# # Coverting funcitonal files to biom
-# func_db_fp = woltka_db_functional_parser(parameters['database'])
-# for level in levels:
-#     func_to_biom_fps = [
-#         ["kegg.modules.coverage", func_db_fp['module'],
-#          'module', False],
-#         ["kegg.modules", func_db_fp['module'], 'module', False],
-#         ["kegg.pathways.coverage", func_db_fp['pathway'],
-#          'pathway', False],
-#         ["kegg.pathways", func_db_fp['pathway'], 'pathway', False],
-#         ["kegg", func_db_fp['enzyme'], 'enzyme', True],
-#         ["normalized", func_db_fp['enzyme'], 'pathway', True]]
-#
-#     for biom_in in func_to_biom_fps:
-#         biom_in_fp = join(func_fp, "profile.%s.%s.txt"
-#                           % (level, biom_in[0]))
-#         output = run_woltka_to_biom(biom_in_fp, biom_in, out_dir,
-#                                     level, 'func')
-#         if biom_in[0] == 'kegg.modules.coverage':
-#             atype = 'KEGG Modules Coverage'
-#         elif biom_in[0] == 'kegg.modules':
-#             atype = 'KEGG Modules'
-#         elif biom_in[0] == 'kegg.pathways.coverage':
-#             atype = 'KEGG Pathways Coverage'
-#         elif biom_in[0] == 'kegg.pathways':
-#             atype = 'KEGG Pathways'
-#         elif biom_in[0] == 'kegg':
-#             atype = 'KEGG'
-#         elif biom_in[0] == 'normalized':
-#             atype = 'Normalized'
-#         else:
-#             # this should never happen but adding for completeness
-#             return False, None, "Not a valid format: %s" % biom_in[0]
-#         aname = 'Functional Predictions - %s, %s' % (level, atype)
-#         ainfo.append(ArtifactInfo(aname, 'BIOM', [(output, 'biom')]))

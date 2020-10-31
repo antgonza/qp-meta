@@ -17,10 +17,10 @@ import os
 
 from qiita_client.testing import PluginTestCase
 
-from qp_woltka import plugin
-from qp_woltka.sortmerna.sortmerna import (
+from qp_meta import plugin
+from qp_meta.sortmerna.sortmerna import (
     generate_sortmerna_commands, sortmerna)
-from qp_woltka.utils import (
+from qp_meta.utils import (
     _format_params, _per_sample_ainfo)
 
 SORTMERNA_PARAMS = {
@@ -158,7 +158,7 @@ class QC_SortmernaTests(PluginTestCase):
 
         self.params['input'] = aid
         data = {'user': 'demo@microbio.me',
-                'command': dumps(['qp-woltka', '2020.11', 'Sortmerna v2.1b']),
+                'command': dumps(['qp-meta', '2020.11', 'Sortmerna v2.1b']),
                 'status': 'running',
                 'parameters': dumps(self.params)}
         jid = self.qclient.post('/apitest/processing_job/', data=data)['job']

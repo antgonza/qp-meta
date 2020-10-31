@@ -140,8 +140,8 @@ def _run_commands(qclient, job_id, commands, msg, cmd_name):
         std_out, std_err, return_value = system_call(cmd)
         if return_value != 0:
             error_msg = ("Error running %s:\nStd out: %s\nStd err: %s"
-                         "\n\nCommand run was:\n%s"
-                         % (cmd_name, std_out, std_err, cmd))
+                         "\n\nCommand run was:\n%s" % (cmd_name, std_out,
+                                                       std_err, cmd))
             return False, error_msg
 
     return True, ""

@@ -15,24 +15,24 @@ from os import remove
 from os.path import exists, isdir, join
 from shutil import rmtree, copyfile
 from tempfile import TemporaryDirectory
-from qp_woltka import plugin
+from qp_meta import plugin
 from tempfile import mkdtemp
 from json import dumps
 from biom import Table
 import numpy as np
 from io import StringIO
-from qp_woltka.woltka.utils import (
+from qp_meta.woltka.utils import (
     get_dbs, get_dbs_list, generate_woltka_dflt_params,
     import_woltka_biom, woltka_db_functional_parser, woltka_parse_module_table,
     woltka_parse_enzyme_table, woltka_parse_pathway_table)
-from qp_woltka.woltka.woltka import (
+from qp_meta.woltka.woltka import (
     generate_woltka_align_commands, _format_params,
     generate_woltka_assign_taxonomy_commands, generate_fna_file,
     generate_woltka_functional_commands, generate_woltka_redist_commands,
-    woltka, woltka_PARAMS)
+    woltka, WOLTKA_PARAMS)
 
 
-class woltkaTests(PluginTestCase):
+class WoltkaTests(PluginTestCase):
 
     def setUp(self):
         plugin("https://localhost:21174", 'register', 'ignored')
@@ -40,7 +40,7 @@ class woltkaTests(PluginTestCase):
         out_dir = mkdtemp()
         self.maxDiff = None
         self.out_dir = out_dir
-        self.db_path = os.environ["QC_woltka_DB_DP"]
+        self.db_path = os.environ["QC_WOLTKA_DB_DP"]
         self.params = {
             'Database': join(self.db_path, 'rep82'),
             'Aligner tool': 'bowtie2',
@@ -189,7 +189,7 @@ class woltkaTests(PluginTestCase):
 
     def test_generate_fna_file(self):
         out_dir = self.out_dir
-        with TemporaryDirectory(dir=out_dir, prefix='woltka_') as fp:
+        with TemporaryDirectory(dir=out_dir, prefix='meta_') as fp:
             sample = [
                 ('s1', 'SKB8.640193', 'support_files/kd_test_1_R1.fastq.gz',
                  'support_files/kd_test_1_R2.fastq.gz')
@@ -199,7 +199,7 @@ class woltkaTests(PluginTestCase):
         self.assertEqual(obs, exp)
 
         # test with only forward
-        with TemporaryDirectory(dir=out_dir, prefix='woltka_') as fp:
+        with TemporaryDirectory(dir=out_dir, prefix='meta_') as fp:
             sample = [
                 ('s1', 'SKB8.640193', 'support_files/kd_test_1_R1.fastq.gz',
                  None)
@@ -341,7 +341,7 @@ class woltkaTests(PluginTestCase):
         self.assertEqual(exp_empty_biom, obs_empty_biom)
 
     def test_format_woltka_params(self):
-        obs = _format_params(self.params, woltka_PARAMS)
+        obs = _format_params(self.params, WOLTKA_PARAMS)
         exp = {
             'database': join(self.db_path, 'rep82'),
             'aligner': 'bowtie2',
@@ -354,7 +354,7 @@ class woltkaTests(PluginTestCase):
 
     def test_generate_woltka_align_commands(self):
         out_dir = self.out_dir
-        with TemporaryDirectory(dir=out_dir, prefix='woltka_') as temp_dir:
+        with TemporaryDirectory(dir=out_dir, prefix='meta_') as temp_dir:
 
             exp_cmd = [
                 ('woltka align --aligner bowtie2 --threads 5 '
@@ -363,7 +363,7 @@ class woltkaTests(PluginTestCase):
                 (self.db_path, temp_dir, temp_dir)
                 ]
 
-            params = _format_params(self.params, woltka_PARAMS)
+            params = _format_params(self.params, WOLTKA_PARAMS)
             obs_cmd = generate_woltka_align_commands(
                 join(temp_dir, 'combined.fna'), temp_dir, params)
 
@@ -371,7 +371,7 @@ class woltkaTests(PluginTestCase):
 
     def test_generate_woltka_assign_taxonomy_commands(self):
         out_dir = self.out_dir
-        with TemporaryDirectory(dir=out_dir, prefix='woltka_') as temp_dir:
+        with TemporaryDirectory(dir=out_dir, prefix='meta_') as temp_dir:
 
             exp_cmd = [
                 ('woltka assign_taxonomy --aligner bowtie2 --no-capitalist '
@@ -380,7 +380,7 @@ class woltkaTests(PluginTestCase):
                 (self.db_path, temp_dir, temp_dir)
                 ]
             exp_output_fp = join(temp_dir, 'profile.tsv')
-            params = _format_params(self.params, woltka_PARAMS)
+            params = _format_params(self.params, WOLTKA_PARAMS)
             obs_cmd, obs_output_fp = generate_woltka_assign_taxonomy_commands(
                 temp_dir, params)
 
@@ -389,7 +389,7 @@ class woltkaTests(PluginTestCase):
 
     def test_generate_woltka_functional_commands(self):
         out_dir = self.out_dir
-        with TemporaryDirectory(dir=out_dir, prefix='woltka_') as temp_dir:
+        with TemporaryDirectory(dir=out_dir, prefix='meta_') as temp_dir:
 
             exp_cmd = [
                 ('woltka functional '
@@ -399,7 +399,7 @@ class woltkaTests(PluginTestCase):
                  join(temp_dir, 'functional'))
                 ]
             profile_dir = join(temp_dir, 'profile.tsv')
-            params = _format_params(self.params, woltka_PARAMS)
+            params = _format_params(self.params, WOLTKA_PARAMS)
             obs_cmd, output = generate_woltka_functional_commands(
                 profile_dir, temp_dir, params, 'species')
 
@@ -407,7 +407,7 @@ class woltkaTests(PluginTestCase):
 
     def test_generate_woltka_redist_commands(self):
         out_dir = self.out_dir
-        with TemporaryDirectory(dir=out_dir, prefix='woltka_') as temp_dir:
+        with TemporaryDirectory(dir=out_dir, prefix='meta_') as temp_dir:
 
             exp_cmd = [
                 ('woltka redistribute '
@@ -417,7 +417,7 @@ class woltkaTests(PluginTestCase):
                  join(temp_dir, 'profile.redist.species.tsv'))
                 ]
             profile_dir = join(temp_dir, 'profile.tsv')
-            params = _format_params(self.params, woltka_PARAMS)
+            params = _format_params(self.params, WOLTKA_PARAMS)
             obs_cmd, output = generate_woltka_redist_commands(
                 profile_dir, temp_dir, params, 'species')
 
@@ -461,13 +461,13 @@ class woltkaTests(PluginTestCase):
                 (fp2_1, 'raw_forward_seqs'),
                 (fp2_2, 'raw_reverse_seqs')]),
             'type': "per_sample_FASTQ",
-            'name': "Test woltka artifact",
+            'name': "Test meta artifact",
             'prep': pid}
         aid = self.qclient.post('/apitest/artifact/', data=data)['artifact']
 
         self.params['input'] = aid
         data = {'user': 'demo@microbio.me',
-                'command': dumps(['qp-woltka', '2020.11', 'Woltka v0.1.1']),
+                'command': dumps(['qp-meta', '2020.11', 'Woltka v0.1.1']),
                 'status': 'running',
                 'parameters': dumps(self.params)}
         jid = self.qclient.post('/apitest/processing_job/', data=data)['job']
@@ -483,7 +483,7 @@ class woltkaTests(PluginTestCase):
         # we are expecting 1 artifacts in total
         pout_dir = partial(join, out_dir)
         self.assertCountEqual(ainfo, [
-            ArtifactInfo('woltka Alignment Profile', 'BIOM',
+            ArtifactInfo('Alignment Profile', 'BIOM',
                          [(pout_dir('otu_table.alignment.profile.biom'),
                            'biom'),
                           (pout_dir('alignment.bowtie2.sam.xz'), 'log')]),
@@ -517,14 +517,14 @@ class woltkaTests(PluginTestCase):
                 (fp2_1, 'raw_forward_seqs'),
                 (fp2_2, 'raw_reverse_seqs')]),
             'type': "per_sample_FASTQ",
-            'name': "Test woltka artifact",
+            'name': "Test artifact",
             'prep': pid}
         aid = self.qclient.post('/apitest/artifact/', data=data)['artifact']
 
         self.params['input'] = aid
         self.params['Database'] = join(self.db_path, 'wol')
         data = {'user': 'demo@microbio.me',
-                'command': dumps(['qp-woltka', '2020.11', 'Woltka v0.1.1']),
+                'command': dumps(['qp-meta', '2020.11', 'Woltka v0.1.1']),
                 'status': 'running',
                 'parameters': dumps(self.params)}
         jid = self.qclient.post('/apitest/processing_job/', data=data)['job']
@@ -540,7 +540,7 @@ class woltkaTests(PluginTestCase):
         # we are expecting 1 artifacts in total
         pout_dir = partial(join, out_dir)
         exp = [
-            ArtifactInfo('woltka Alignment Profile', 'BIOM',
+            ArtifactInfo('Alignment Profile', 'BIOM',
                          [(pout_dir('otu_table.alignment.profile.biom'),
                            'biom'),
                           (pout_dir('alignment.bowtie2.sam.xz'), 'log')]),

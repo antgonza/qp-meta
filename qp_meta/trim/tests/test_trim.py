@@ -16,11 +16,11 @@ from functools import partial
 
 from qiita_client.testing import PluginTestCase
 
-from qp_woltka import plugin
-from qp_woltka.trim.trim import (generate_trim_commands, trim)
-from qp_woltka.utils import (
+from qp_meta import plugin
+from qp_meta.trim.trim import (generate_trim_commands, trim)
+from qp_meta.utils import (
     _format_params, make_read_pairs_per_sample, _per_sample_ainfo)
-import qp_woltka.trim as kd
+import qp_meta.trim as kd
 
 ATROPOS_PARAMS = {
     'adapter': 'Fwd read adapter', 'A': 'Rev read adapter',
@@ -269,7 +269,7 @@ class QC_TrimTests(PluginTestCase):
 
         self.params['input'] = aid
         data = {'user': 'demo@microbio.me',
-                'command': dumps(['qp-woltka', '2020.11', 'Atropos v1.1.24']),
+                'command': dumps(['qp-meta', '2020.11', 'Atropos v1.1.24']),
                 'status': 'running',
                 'parameters': dumps(self.params)}
         jid = self.qclient.post('/apitest/processing_job/', data=data)['job']
@@ -332,7 +332,7 @@ class QC_TrimTests(PluginTestCase):
 
         self.params['input'] = aid
         data = {'user': 'demo@microbio.me',
-                'command': dumps(['qp-woltka', '2020.11', 'Atropos v1.1.24']),
+                'command': dumps(['qp-meta', '2020.11', 'Atropos v1.1.24']),
                 'status': 'running',
                 'parameters': dumps(self.params)}
         jid = self.qclient.post('/apitest/processing_job/', data=data)['job']

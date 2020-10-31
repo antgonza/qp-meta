@@ -9,7 +9,7 @@
 
 from os.path import join, basename
 from os import environ
-from qp_woltka.utils import (
+from qp_meta.utils import (
     _format_params, make_read_pairs_per_sample,
     _run_commands, _per_sample_ainfo)
 
