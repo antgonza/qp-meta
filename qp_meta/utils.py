@@ -180,7 +180,9 @@ def _per_sample_ainfo(
 
 
 def _generate_qiime_mapping_file(prep_file, out_dir):
-    df = pd.read_csv(prep_file, sep='\t', index_col=0, dtype='str')
+    df = pd.read_csv(prep_file, sep='\t', dtype='str', na_values=[],
+                     keep_default_na=True)
+    df.set_index('sample_name', inplace=True)
 
     qiime_map = f'{out_dir}/qiime-mapping-file.txt'
     df.index.name = '#SampleID'
