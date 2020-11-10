@@ -9,6 +9,8 @@
 # -----------------------------------------------------------------------------
 # This file contains functions used by multiple commands
 # -----------------------------------------------------------------------------
+import pandas as pd
+
 from qiita_client.util import system_call, get_sample_names_by_run_prefix
 from itertools import zip_longest
 from os.path import basename, join, exists
@@ -175,3 +177,15 @@ def _per_sample_ainfo(
         raise ValueError("No sequences left after %s" % prg_name)
 
     return [ArtifactInfo(files_type_name, 'per_sample_FASTQ', files)]
+
+
+def _generate_qiime_mapping_file(prep_file, out_dir):
+    df = pd.read_csv(prep_file, sep='\t', dtype='str', na_values=[],
+                     keep_default_na=False)
+    df.set_index('sample_name', inplace=True)
+
+    qiime_map = f'{out_dir}/qiime-mapping-file.txt'
+    df.index.name = '#SampleID'
+    df.to_csv(qiime_map, sep='\t')
+
+    return qiime_map

@@ -10,7 +10,7 @@ from os.path import join
 from tempfile import TemporaryDirectory
 from qp_meta.utils import (
     _format_params, make_read_pairs_per_sample,
-    _run_commands, _per_sample_ainfo)
+    _run_commands, _per_sample_ainfo, _generate_qiime_mapping_file)
 
 BOWTIE2_PARAMS = {
     'x': 'Bowtie2 database to filter',
@@ -123,7 +123,7 @@ def filter(qclient, job_id, parameters, out_dir):
     # Get the artifact metadata
     prep_info = qclient.get('/qiita_db/prep_template/%s/'
                             % artifact_info['prep_information'][0])
-    qiime_map = prep_info['qiime-map']
+    prep_file = _generate_qiime_mapping_file(prep_info['prep-file'], out_dir)
 
     # Step 2 generating command
     qclient.update_job_step(job_id, "Step 2 of 4: Generating"
@@ -132,7 +132,7 @@ def filter(qclient, job_id, parameters, out_dir):
     with TemporaryDirectory(dir=out_dir, prefix='filter_') as temp_dir:
         rs = fps['raw_reverse_seqs'] if 'raw_reverse_seqs' in fps else []
         commands, samples = generate_filter_commands(fps['raw_forward_seqs'],
-                                                     rs, qiime_map, out_dir,
+                                                     rs, prep_file, out_dir,
                                                      temp_dir, parameters)
 
         # Step 3 execute filtering command
