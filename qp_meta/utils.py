@@ -182,32 +182,6 @@ def _per_sample_ainfo(
 def _generate_qiime_mapping_file(prep_file, out_dir):
     df = pd.read_csv(prep_file, sep='\t', index_col=0, dtype='str')
 
-    rename_cols = {
-        'barcode': 'BarcodeSequence',
-        'primer': 'LinkerPrimerSequence',
-    }
-    sort_columns = ['BarcodeSequence', 'LinkerPrimerSequence']
-
-    if 'reverselinkerprimer' in df.columns:
-        rename_cols['reverselinkerprimer'] = 'ReverseLinkerPrimer'
-        sort_columns.append('ReverseLinkerPrimer')
-
-    df.rename(columns=rename_cols, inplace=True)
-    # by design the prep info file doesn't have a Description column so we can
-    # prefil without checking
-    index = df.index
-    df['Description'] = pd.Series(['XXQIITAXX'] * len(index), index=index)
-
-    # sorting columns to be a valid "classic" QIIME1 mapping file
-    columns = df.columns.values.tolist()
-    columns.remove('BarcodeSequence')
-    columns.remove('LinkerPrimerSequence')
-    columns.remove('Description')
-    sort_columns.extend(columns)
-    sort_columns.append('Description')
-
-    df = df[sort_columns]
-
     qiime_map = f'{out_dir}/qiime-mapping-file.txt'
     df.index.name = '#SampleID'
     df.to_csv(qiime_map, sep='\t')
