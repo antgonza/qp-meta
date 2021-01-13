@@ -15,7 +15,7 @@ from .sortmerna import sortmerna_cmd
 
 # Initialize the plugin
 plugin = QiitaPlugin(
-    'qp-meta', '2020.11', 'meta analysis tools for shotgun data')
+    'qp-meta', '2021.01', 'meta analysis tools for shotgun data')
 
 plugin.register_command(trim_cmd)
 plugin.register_command(filter_cmd)
