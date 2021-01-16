@@ -11,7 +11,7 @@
 from setuptools import setup
 
 
-__version__ = "2020.11"
+__version__ = "2021.01"
 
 
 classes = """
@@ -42,8 +42,7 @@ setup(name='qp-meta',
       author_email="qiita.help@gmail.com",
       url='https://github.com/biocore/qiita',
       test_suite='nose.collector',
-      packages=['qp_meta', 'qp_meta/trim',
-                'qp_meta/filter',
+      packages=['qp_meta',
                 'qp_meta/sortmerna'],
       package_data={
         'qp_meta': [
