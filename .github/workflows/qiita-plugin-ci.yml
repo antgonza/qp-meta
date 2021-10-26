@@ -94,7 +94,7 @@ jobs:
           for file in $(ls); do gunzip $file; done
           popd
 
-          configure_meta --env-script "source /home/runner/.profile; conda activate qp-meta; export ENVIRONMENT=\"source /home/runner/.profile; conda activate qp-meta\"" --server-cert $QIITA_SERVER_CERT
+          configure_meta --env-script "source /home/runner/.profile; conda activate qp-meta; export QC_SORTMERNA_DB_DP=$PWD/qp_meta/sortmerna/databases/rRNA_databases/; export ENVIRONMENT=\"source /home/runner/.profile; conda activate qp-meta\"" --server-cert $QIITA_SERVER_CERT
 
           echo "Available Qiita plugins"
           ls ~/.qiita_plugins/
@@ -137,6 +137,7 @@ jobs:
         run: |
           conda activate qp-meta
           export QC_SORTMERNA_DB_DP=$PWD/qp_meta/sortmerna/databases/rRNA_databases/
+          export ENVIRONMENT="source /home/runner/.profile; conda activate qp-meta"
 
           export PYTHONWARNINGS="ignore:Certificate for localhost has no \`subjectAltName\`"
 
