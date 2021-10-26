@@ -77,6 +77,9 @@ jobs:
       - name: Install Qiita plugins
         shell: bash -l {0}
         run: |
+          conda config --add channels anaconda
+          conda config --add channels conda-forge
+          conda config --add channels bioconda
           conda create -q --yes -n qp-meta biom-format bowtie2 sortmerna=2.1b samtools pigz
           conda activate qp-meta
 
