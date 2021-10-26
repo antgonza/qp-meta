@@ -13,9 +13,16 @@ import pandas as pd
 
 from qiita_client.util import system_call, get_sample_names_by_run_prefix
 from itertools import zip_longest
-from os.path import basename, join, exists
+from os import environ
+from os.path import basename, join, exists, expanduser
+from configparser import ConfigParser
 from functools import partial
-from qiita_client import ArtifactInfo
+from qiita_client import ArtifactInfo, QiitaClient
+
+
+plugin_details = {'name': 'qp-meta',
+                  'version': '2021.11',
+                  'description': 'Woltka'}
 
 
 def make_read_pairs_per_sample(forward_seqs, reverse_seqs, map_file):
@@ -105,8 +112,7 @@ def make_read_pairs_per_sample(forward_seqs, reverse_seqs, map_file):
                                  'Reverse read: %s\n' %
                                  (run_prefix, fwd_fn, rev_fn))
 
-            samples.append((run_prefix, sn_by_rp[run_prefix], fwd_fp,
-                            rev_fp))
+            samples.append((run_prefix, sn_by_rp[run_prefix], fwd_fp, rev_fp))
 
         used_prefixes.add(run_prefix)
 
@@ -150,8 +156,7 @@ def _run_commands(qclient, job_id, commands, msg, cmd_name):
 
 
 def _per_sample_ainfo(
-        out_dir, samples, suffixes, prg_name,
-        files_type_name, fwd_and_rev=False):
+        out_dir, samples, suffixes, files_type_name, fwd_and_rev=False):
     files = []
     missing_files = []
     smd = partial(join, out_dir)
@@ -174,9 +179,9 @@ def _per_sample_ainfo(
     if not files:
         # Command did not create any files, which means that no sequence
         # was kept after quality control and filtering for host data
-        raise ValueError("No sequences left after %s" % prg_name)
+        raise ValueError("No files were generated %s")
 
-    return [ArtifactInfo(files_type_name, 'per_sample_FASTQ', files)]
+    return ArtifactInfo(files_type_name, 'per_sample_FASTQ', files)
 
 
 def _generate_qiime_mapping_file(prep_file, out_dir):
@@ -189,3 +194,21 @@ def _generate_qiime_mapping_file(prep_file, out_dir):
     df.to_csv(qiime_map, sep='\t')
 
     return qiime_map
+
+
+def client_connect(url):
+    name = plugin_details['name']
+    version = plugin_details['version']
+
+    config = ConfigParser()
+    conf_dir = environ.get(
+        'QIITA_PLUGINS_DIR', join(expanduser('~'), '.qiita_plugins'))
+    conf_fp = join(conf_dir, f'{name}_{version}.conf')
+
+    with open(conf_fp, 'U') as conf_file:
+        config.readfp(conf_file)
+    qclient = QiitaClient(url, config.get('oauth2', 'CLIENT_ID'),
+                          config.get('oauth2', 'CLIENT_SECRET'),
+                          server_cert=config.get('oauth2', 'SERVER_CERT'))
+
+    return qclient

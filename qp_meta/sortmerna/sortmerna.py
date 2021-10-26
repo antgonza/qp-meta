@@ -11,7 +11,7 @@ from os.path import join, basename
 from os import environ
 from qp_meta.utils import (
     _format_params, make_read_pairs_per_sample,
-    _run_commands, _per_sample_ainfo, _generate_qiime_mapping_file)
+    _per_sample_ainfo, _generate_qiime_mapping_file)
 
 DIR = environ["QC_SORTMERNA_DB_DP"]
 
@@ -40,6 +40,15 @@ SORTMERNA_PARAMS = {
     'num_alignments': 'Number of alignments',
     'a': 'Number of threads',
     'm': 'Memory'}
+
+
+# resources per job
+PPN = 10
+MEMORY = '40g'
+WALLTIME = '30:00:00'
+FINISH_MEMORY = '48g'
+FINISH_WALLTIME = '10:00:00'
+MAX_RUNNING = 8
 
 
 def generate_sortmerna_commands(forward_seqs, reverse_seqs, map_file,
@@ -139,59 +148,111 @@ def sortmerna(qclient, job_id, parameters, out_dir):
     bool, list, str
         The results of the job
     """
-    # Step 1 get the rest of the information need to run Sortmerna
-    qclient.update_job_step(job_id, "Step 1 of 4: Collecting information")
-    artifact_id = parameters['input']
-    del parameters['input']
-
-    # Get the artifact filepath information
-    artifact_info = qclient.get("/qiita_db/artifacts/%s/" % artifact_id)
-    fps = artifact_info['files']
-
-    # Get the artifact metadata
-    prep_info = qclient.get('/qiita_db/prep_template/%s/'
-                            % artifact_info['prep_information'][0])
-    prep_file = _generate_qiime_mapping_file(prep_info['prep-file'], out_dir)
-
-    # Step 2 generating command for Sortmerna
-    qclient.update_job_step(job_id, "Step 2 of 4: Generating"
-                                    " SortMeRNA commands")
-    rs = fps['raw_reverse_seqs'] if 'raw_reverse_seqs' in fps else []
-    commands, samples = generate_sortmerna_commands(
-                                                fps['raw_forward_seqs'],
-                                                rs, prep_file, out_dir,
-                                                parameters)
-
-    # Step 3 executing Sortmerna
-    len_cmd = len(commands)
-    msg = "Step 3 of 4: Executing ribosomal filtering (%d/{0})".format(len_cmd)
-    success, msg = _run_commands(qclient, job_id,
-                                 commands, msg, 'QC_Sortmerna')
-    if not success:
-        return False, None, msg
+    qclient.update_job_step(
+        job_id, "Step 3 of 4: Finishing SortMeRNA")
 
     ainfo = []
 
     # Generates 2 artifacts: one for the ribosomal
     # reads and other for the non-ribosomal reads
+    samples = []
+    with open(f'{out_dir}/{job_id}.samples.tsv') as f:
+        for line in f.readlines():
+            line = line.split()
+            if len(line) == 3:
+                line.append(None)
+            samples.append(tuple(line))
 
-    # Step 4 generating artifacts for Nonribosomal reads
-    msg = ("Step 4 of 5: Generating artifacts "
-           "for Nonribosomal reads (%d/{0})").format(len_cmd)
+    # checking the size of the first entry to see if there are reverse_seqs
+    reverse = False
+    if len(samples[0]) > 3:
+        reverse = True
+
     suffixes = ['%s.nonribosomal.R1.fastq.gz', '%s.nonribosomal.R2.fastq.gz']
-    prg_name = 'Sortmerna'
     file_type_name = 'Non-ribosomal reads'
-    ainfo.extend(_per_sample_ainfo(
-        out_dir, samples, suffixes, prg_name, file_type_name, bool(rs)))
-
-    # Step 5 generating artifacts for Ribosomal reads
-    msg = ("Step 5 of 5: Generating artifacts "
-           "for Ribosomal reads (%d/{0})").format(len_cmd)
+    ainfo = [_per_sample_ainfo(
+        out_dir, samples, suffixes, file_type_name, reverse)]
 
     suffixes = ['%s.ribosomal.R1.fastq.gz', '%s.ribosomal.R2.fastq.gz']
-    prg_name = 'Sortmerna'
     file_type_name = 'Ribosomal reads'
-    ainfo.extend(_per_sample_ainfo(
-        out_dir, samples, suffixes, prg_name, file_type_name, bool(rs)))
+    ainfo.append(_per_sample_ainfo(
+        out_dir, samples, suffixes, file_type_name, reverse))
 
     return True, ainfo, ""
+
+
+def sortmerna_to_array(files, out_dir, params, prep_info, url, job_id):
+    """Creates qsub files for submission of per sample bowtie2 and woltka
+    """
+    prep_file = _generate_qiime_mapping_file(prep_info, out_dir)
+
+    reverse_seqs = []
+    if 'raw_reverse_seqs' in files:
+        reverse_seqs = files['raw_reverse_seqs']
+
+    commands, samples = generate_sortmerna_commands(
+        files['raw_forward_seqs'], reverse_seqs, prep_file, out_dir, params)
+
+    # writting the job array details
+    details_name = join(out_dir, 'sortmerna.array-details')
+    with open(details_name, 'w') as details:
+        details.write('\n'.join(commands))
+    n_jobs = len(commands)
+
+    # all the setup pieces
+    lines = ['#!/bin/bash',
+             '#PBS -M qiita.help@gmail.com',
+             f'#PBS -N {job_id}',
+             f'#PBS -l nodes=1:ppn={PPN}',
+             f'#PBS -l walltime={WALLTIME}',
+             f'#PBS -l mem={MEMORY}',
+             f'#PBS -o {out_dir}/{job_id}' + '_${PBS_ARRAYID}.log',
+             f'#PBS -e {out_dir}/{job_id}' + '_${PBS_ARRAYID}.err',
+             f'#PBS -t 1-{n_jobs}%{MAX_RUNNING}',
+             '#PBS -l epilogue=/home/qiita/qiita-epilogue.sh',
+             'set -e',
+             f'cd {out_dir}',
+             f'{params["environment"]}',
+             'date',  # start time
+             'hostname',  # executing system
+             'echo ${PBS_JOBID} ${PBS_ARRAYID}',
+             'offset=${PBS_ARRAYID}',
+             'step=$(( $offset - 0 ))',
+             f'cmd=$(head -n $step {details_name} | tail -n 1)',
+             'eval $cmd',
+             'set +e',
+             'date']
+    main_qsub_fp = join(out_dir, f'{job_id}.qsub')
+    with open(main_qsub_fp, 'w') as job:
+        job.write('\n'.join(lines))
+        job.write('\n')
+
+    # finish job
+    lines = ['#!/bin/bash',
+             '#PBS -M qiita.help@gmail.com',
+             f'#PBS -N finish-{job_id}',
+             '#PBS -l nodes=1:ppn=1',
+             f'#PBS -l walltime={FINISH_WALLTIME}',
+             f'#PBS -l mem={FINISH_MEMORY}',
+             f'#PBS -o {out_dir}/finish-{job_id}.log',
+             f'#PBS -e {out_dir}/finish-{job_id}.err',
+             '#PBS -l epilogue=/home/qiita/qiita-epilogue.sh',
+             'set -e',
+             f'cd {out_dir}',
+             f'{params["environment"]}',
+             'date',  # start time
+             'hostname',  # executing system
+             'echo $PBS_JOBID',
+             f'finish_sortmerna {url} {job_id} {out_dir}\n'
+             "date"]
+    finish_qsub_fp = join(out_dir, f'{job_id}.finish.qsub')
+    with open(finish_qsub_fp, 'w') as out:
+        out.write('\n'.join(lines))
+        out.write('\n')
+
+    samples_fp = join(out_dir, f'{job_id}.samples.tsv')
+    with open(samples_fp, 'w') as out:
+        out.write('\n'.join(
+            ['\t'.join([ss for ss in s if ss is not None]) for s in samples]))
+
+    return main_qsub_fp, finish_qsub_fp, samples_fp

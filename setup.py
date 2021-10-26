@@ -11,7 +11,7 @@
 from setuptools import setup
 
 
-__version__ = "2021.01"
+__version__ = "2021.11"
 
 
 classes = """
@@ -51,6 +51,10 @@ setup(name='qp-meta',
       scripts=['scripts/configure_meta', 'scripts/start_meta'],
       extras_require={'test': ["nose >= 0.10.1", "pep8"]},
       install_requires=['click >= 3.3', 'future', 'pandas >= 0.15',
-                        'h5py >= 2.3.1', 'biom-format'],
+                        'h5py >= 2.3.1', 'biom-format',
+                        'qiita-files @ https://github.com/'
+                        'qiita-spots/qiita-files/archive/master.zip',
+                        'qiita_client @ https://github.com/'
+                        'qiita-spots/qiita_client/archive/master.zip'],
       classifiers=classifiers
       )

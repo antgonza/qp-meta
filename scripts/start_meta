@@ -9,17 +9,57 @@
 # -----------------------------------------------------------------------------
 
 import click
+from subprocess import run, PIPE
+from os.path import dirname
+from os import environ
 
 from qp_meta import plugin
+from qp_meta.sortmerna.sortmerna import sortmerna_to_array
+from qp_meta.utils import client_connect
 
 
 @click.command()
 @click.argument('url', required=True)
 @click.argument('job_id', required=True)
-@click.argument('output_dir', required=True)
-def execute(url, job_id, output_dir):
+@click.argument('out_dir', required=True)
+def execute(url, job_id, out_dir):
     """Executes the task given by job_id and puts the output in output_dir"""
-    plugin(url, job_id, output_dir)
+    # there are basically 2 different kinds of jobs: register (commands)
+    # and everything else
+    if 'register' in job_id:
+        plugin(url, job_id, out_dir)
+    else:
+        qclient = client_connect(url)
+        job_info = qclient.get_job_info(job_id)
+        parameters = job_info['parameters']
+
+        qclient.update_job_step(
+            job_id, "Step 1 of 4: Collecting info and generating submission")
+        artifact_id = parameters['input']
+        del parameters['input']
+
+        parameters['environment'] = environ["ENVIRONMENT"]
+
+        artifact_info = self.qclient.get("/qiita_db/artifacts/%s/" % aid)
+        prep_info = qclient.get('/qiita_db/prep_template/%s/'
+                                % artifact_info['prep_information'][0])
+        prep_file = prep_info['prep-file']
+
+        main_qsub_fp, finish_qsub_fp, samples_fp = sortmerna_to_array(
+            artifact_info['files'], out_dir, parameters, prep_file,
+            url, job_id)
+
+        # Submitting jobs and returning id
+        main_job = run(['qsub', main_qsub_fp], stdout=PIPE)
+        main_job_id = main_job.stdout.decode('utf8')
+        finish_qsub = run(['qsub', f'-W depend=afteranyarray:{main_job_id}',
+                         finish_qsub_fp], stdout=PIPE)
+        finish_job_id = finish_job.stdout.decode('utf8')
+        print(f'{main_job_id}, {finish_job_id}')
+
+        qclient.update_job_step(
+            job_id, "Step 2 of 4: Running SortMeRNA")
+
 
 if __name__ == '__main__':
     execute()
