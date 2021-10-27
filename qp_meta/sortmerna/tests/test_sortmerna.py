@@ -127,7 +127,6 @@ class QC_SortmernaTests(PluginTestCase):
         out_dir = mkdtemp()
         self._clean_up_files.append(out_dir)
         url = 'this-is-my-url'
-        sdb = environ['QC_SORTMERNA_DB_DP']
 
         main_qsub_fp, finish_qsub_fp, samples_fp = sortmerna_to_array(
             artifact_info['files'], out_dir, self.params, prep_file,
@@ -158,8 +157,7 @@ class QC_SortmernaTests(PluginTestCase):
             '#PBS -l epilogue=/home/qiita/qiita-epilogue.sh\n',
             'set -e\n',
             f'cd {out_dir}\n',
-            f'export QC_SORTMERNA_DB_DP={sdb}; '
-            'source ~/.bash_profile; conda activate qp-meta\n',
+            f'{self.params["environment"]}\n',
             'date\n',
             'hostname\n',
             'echo ${PBS_JOBID} ${PBS_ARRAYID}\n',
@@ -184,8 +182,7 @@ class QC_SortmernaTests(PluginTestCase):
             '#PBS -l epilogue=/home/qiita/qiita-epilogue.sh\n',
             'set -e\n',
             f'cd {out_dir}\n',
-            f'export QC_SORTMERNA_DB_DP={sdb}; '
-            'source ~/.bash_profile; conda activate qp-meta\n',
+            f'{self.params["environment"]}\n',
             'date\n',
             'hostname\n',
             'echo $PBS_JOBID\n',
@@ -299,7 +296,6 @@ class QC_SortmernaTests(PluginTestCase):
         out_dir = mkdtemp()
         self._clean_up_files.append(out_dir)
         url = 'this-is-my-url'
-        sdb = environ['QC_SORTMERNA_DB_DP']
 
         main_qsub_fp, finish_qsub_fp, samples_fp = sortmerna_to_array(
             artifact_info['files'], out_dir, self.params, prep_file,
@@ -330,8 +326,7 @@ class QC_SortmernaTests(PluginTestCase):
             '#PBS -l epilogue=/home/qiita/qiita-epilogue.sh\n',
             'set -e\n',
             f'cd {out_dir}\n',
-            f'export QC_SORTMERNA_DB_DP={sdb}; '
-            'source ~/.bash_profile; conda activate qp-meta\n',
+            f'{self.params["environment"]}\n',
             'date\n',
             'hostname\n',
             'echo ${PBS_JOBID} ${PBS_ARRAYID}\n',
@@ -356,8 +351,7 @@ class QC_SortmernaTests(PluginTestCase):
             '#PBS -l epilogue=/home/qiita/qiita-epilogue.sh\n',
             'set -e\n',
             f'cd {out_dir}\n',
-            f'export QC_SORTMERNA_DB_DP={sdb}; '
-            'source ~/.bash_profile; conda activate qp-meta\n',
+            f'{self.params["environment"]}\n',
             'date\n',
             'hostname\n',
             'echo $PBS_JOBID\n',
