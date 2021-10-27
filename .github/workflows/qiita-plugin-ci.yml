@@ -13,7 +13,7 @@ jobs:
     services:
       postgres:
         # Docker Hub image
-        image: postgres:9.5
+        image: postgres:13.4
         env:
           POSTGRES_DB: postgres
           POSTGRES_USER: postgres
@@ -71,6 +71,8 @@ jobs:
         shell: bash -l {0}
         run: |
           conda activate qiita
+          export QIITA_SERVER_CERT=`pwd`/qiita-dev/qiita_core/support_files/server.crt
+          export QIITA_CONFIG_FP=`pwd`/qiita-dev/qiita_core/support_files/config_test.cfg
           pip install qiita-dev/ --no-binary redbiom
           mkdir ~/.qiita_plugins
 
