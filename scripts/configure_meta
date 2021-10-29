@@ -12,6 +12,7 @@ import click
 
 from qp_meta import plugin
 
+
 @click.command()
 @click.option('--env-script', prompt='Environment script',
               default='source activate qp-meta')
@@ -22,6 +23,7 @@ def config(env_script, server_cert):
         server_cert = None
     plugin.generate_config(env_script, 'start_meta',
                            server_cert=server_cert)
+
 
 if __name__ == '__main__':
     config()

@@ -167,4 +167,4 @@ jobs:
     - name: lint
       run: |
         pip install -q flake8
-        flake8 qp_meta setup.py scripts
+        flake8 qp_meta setup.py scripts/*
