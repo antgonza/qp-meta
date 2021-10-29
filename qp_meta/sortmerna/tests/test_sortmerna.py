@@ -205,9 +205,9 @@ class QC_SortmernaTests(PluginTestCase):
             f'{RNA_REF_DB} --reads {out_dir}/S22205_S104_L001_R1_001.fastq '
             f'--aligned {out_dir}/S22205_S104.ribosomal.R1 --other '
             f'{out_dir}/S22205_S104.nonribosomal.R1 --fastx -a 10 --blast 1 '
-            '-m 3988 --num_alignments 1 && pigz -p 5 -c '
+            '-m 3988 --num_alignments 1 && pigz -p 10 -c '
             f'{out_dir}/S22205_S104.ribosomal.R1.fastq > '
-            f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz && pigz -p 5 -c '
+            f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz && pigz -p 10 -c '
             f'{out_dir}/S22205_S104.nonribosomal.R1.fastq > '
             f'{out_dir}/S22205_S104.nonribosomal.R1.fastq.gz;\n',
             f'unpigz -p 10 -c {adir}/S22205_S104_L001_R2_001.fastq.gz > '
@@ -215,9 +215,9 @@ class QC_SortmernaTests(PluginTestCase):
             f'{RNA_REF_DB} --reads {out_dir}/S22205_S104_L001_R2_001.fastq '
             f'--aligned {out_dir}/S22205_S104.ribosomal.R2 --other '
             f'{out_dir}/S22205_S104.nonribosomal.R2 --fastx -a 10 --blast 1 '
-            '-m 3988 --num_alignments 1 && pigz -p 5 -c '
+            '-m 3988 --num_alignments 1 && pigz -p 10 -c '
             f'{out_dir}/S22205_S104.ribosomal.R2.fastq > '
-            f'{out_dir}/S22205_S104.ribosomal.R2.fastq.gz && pigz -p 5 -c '
+            f'{out_dir}/S22205_S104.ribosomal.R2.fastq.gz && pigz -p 10 -c '
             f'{out_dir}/S22205_S104.nonribosomal.R2.fastq > '
             f'{out_dir}/S22205_S104.nonribosomal.R2.fastq.gz;\n',
             f'unpigz -p 10 -c {adir}/S22282_S102_L001_R1_001.fastq.gz > '
@@ -225,9 +225,9 @@ class QC_SortmernaTests(PluginTestCase):
             f'{RNA_REF_DB} --reads {out_dir}/S22282_S102_L001_R1_001.fastq '
             f'--aligned {out_dir}/S22282_S102.ribosomal.R1 --other '
             f'{out_dir}/S22282_S102.nonribosomal.R1 --fastx -a 10 --blast 1 '
-            '-m 3988 --num_alignments 1 && pigz -p 5 -c '
+            '-m 3988 --num_alignments 1 && pigz -p 10 -c '
             f'{out_dir}/S22282_S102.ribosomal.R1.fastq > '
-            f'{out_dir}/S22282_S102.ribosomal.R1.fastq.gz && pigz -p 5 -c '
+            f'{out_dir}/S22282_S102.ribosomal.R1.fastq.gz && pigz -p 10 -c '
             f'{out_dir}/S22282_S102.nonribosomal.R1.fastq > '
             f'{out_dir}/S22282_S102.nonribosomal.R1.fastq.gz;\n',
             f'unpigz -p 10 -c {adir}/S22282_S102_L001_R2_001.fastq.gz > '
@@ -235,9 +235,9 @@ class QC_SortmernaTests(PluginTestCase):
             f'{RNA_REF_DB} --reads {out_dir}/S22282_S102_L001_R2_001.fastq '
             f'--aligned {out_dir}/S22282_S102.ribosomal.R2 --other '
             f'{out_dir}/S22282_S102.nonribosomal.R2 --fastx -a 10 --blast 1 '
-            '-m 3988 --num_alignments 1 && pigz -p 5 -c '
+            '-m 3988 --num_alignments 1 && pigz -p 10 -c '
             f'{out_dir}/S22282_S102.ribosomal.R2.fastq > '
-            f'{out_dir}/S22282_S102.ribosomal.R2.fastq.gz && pigz -p 5 -c '
+            f'{out_dir}/S22282_S102.ribosomal.R2.fastq.gz && pigz -p 10 -c '
             f'{out_dir}/S22282_S102.nonribosomal.R2.fastq > '
             f'{out_dir}/S22282_S102.nonribosomal.R2.fastq.gz;']
         self.assertEqual(exp_details, details)
@@ -372,9 +372,9 @@ class QC_SortmernaTests(PluginTestCase):
             f'{RNA_REF_DB} --reads {out_dir}/S22205_S104_L001_R1_001.fastq '
             f'--aligned {out_dir}/S22205_S104.ribosomal.R1 --other '
             f'{out_dir}/S22205_S104.nonribosomal.R1 --fastx -a 10 --blast 1 '
-            '-m 3988 --num_alignments 1 && pigz -p 5 -c '
+            '-m 3988 --num_alignments 1 && pigz -p 10 -c '
             f'{out_dir}/S22205_S104.ribosomal.R1.fastq > '
-            f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz && pigz -p 5 -c '
+            f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz && pigz -p 10 -c '
             f'{out_dir}/S22205_S104.nonribosomal.R1.fastq > '
             f'{out_dir}/S22205_S104.nonribosomal.R1.fastq.gz;\n',
             f'unpigz -p 10 -c {adir}/S22282_S102_L001_R1_001.fastq.gz > '
@@ -382,9 +382,9 @@ class QC_SortmernaTests(PluginTestCase):
             f'{RNA_REF_DB} --reads {out_dir}/S22282_S102_L001_R1_001.fastq '
             f'--aligned {out_dir}/S22282_S102.ribosomal.R1 --other '
             f'{out_dir}/S22282_S102.nonribosomal.R1 --fastx -a 10 --blast 1 '
-            '-m 3988 --num_alignments 1 && pigz -p 5 -c '
+            '-m 3988 --num_alignments 1 && pigz -p 10 -c '
             f'{out_dir}/S22282_S102.ribosomal.R1.fastq > '
-            f'{out_dir}/S22282_S102.ribosomal.R1.fastq.gz && pigz -p 5 -c '
+            f'{out_dir}/S22282_S102.ribosomal.R1.fastq.gz && pigz -p 10 -c '
             f'{out_dir}/S22282_S102.nonribosomal.R1.fastq > '
             f'{out_dir}/S22282_S102.nonribosomal.R1.fastq.gz;']
         self.assertEqual(exp_details, details)
