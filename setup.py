@@ -48,7 +48,7 @@ setup(name='qp-meta',
         'qp_meta': [
             'support_files/config_file.cfg'],
         'sortmerna': ['qp_meta/sortmerna/databases/*']},
-      scripts=['scripts/configure_meta', 'scripts/start_meta'],
+      scripts=['scripts/*'],
       extras_require={'test': ["nose >= 0.10.1", "pep8"]},
       install_requires=['click >= 3.3', 'future', 'pandas >= 0.15',
                         'h5py >= 2.3.1', 'biom-format',
