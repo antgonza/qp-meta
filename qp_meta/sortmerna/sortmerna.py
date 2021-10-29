@@ -38,7 +38,6 @@ RNA_REF_DB = (
 SORTMERNA_PARAMS = {
     'blast': 'Output blast format',
     'num_alignments': 'Number of alignments',
-    'a': 'Number of threads',
     'm': 'Memory'}
 
 
@@ -87,7 +86,6 @@ def generate_sortmerna_commands(forward_seqs, reverse_seqs, map_file,
 
     cmds = []
     param_string = _format_params(parameters, SORTMERNA_PARAMS)
-    threads = parameters['Number of threads']
 
     # Sortmerna 2.1 does not support direct processing of
     # compressed files currently
@@ -102,7 +100,7 @@ def generate_sortmerna_commands(forward_seqs, reverse_seqs, map_file,
                 "pigz -p {thrds} -c {smr_nr_op}.fastq > {smr_nr_op_gz};"
                 )
 
-    arguments = {'thrds': threads,
+    arguments = {'thrds': PPN,
                  'ref_db': RNA_REF_DB, 'params': param_string}
 
     for run_prefix, sample, f_fp, r_fp in samples:

@@ -26,7 +26,6 @@ from qp_meta.utils import (
 SORTMERNA_PARAMS = {
     'blast': 'Output blast format',
     'num_alignments': 'Number of alignments',
-    'a': 'Number of threads',
     'm': 'Memory'}
 
 
@@ -40,7 +39,6 @@ class QC_SortmernaTests(PluginTestCase):
                        'Output blast format': '1',
                        'Number of alignments': '1',
                        'Memory': '3988',
-                       'Number of threads': '5'
         }
         self._clean_up_files = []
 

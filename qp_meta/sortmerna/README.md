@@ -14,7 +14,7 @@ Even if you are dealing with ribosomal RNA subtracted libraries, there will be s
 residual ribosomal RNA in the libraries that you want to remove/separate from
 the non ribosomal RNA sequences.
 
-Input: Quality filtered metatranscriptomics reads (FASTA/FASTQ) 
+Input: Quality filtered metatranscriptomics reads (FASTA/FASTQ)
 
 ## Building Custom databases
 
@@ -26,12 +26,12 @@ Using the ARB package [2] to extract FASTA files for:
 Remove partial sequences from all databases using HMMER 3.1b1 [4] (meta_RNA [5] HMM profiles used)
 
 
-Use SumaClust version 1.0.00 [6] to cluster sequences at various % id using the FASTA files generated in the previous step 
+Use SumaClust version 1.0.00 [6] to cluster sequences at various % id using the FASTA files generated in the previous step
 
 
 Extract only the cluster centers
 
-  
+
 
 ## Indexing custom databases
 
@@ -41,7 +41,7 @@ Multiple databases can be separated by ":"
 indexdb_rna command available as a part of SortMeRNA package.
 
 
-## Currently indexed databases 
+## Currently indexed databases
 
 rRNA from bacteria, archaea, eukarya (SILVA and rfam database)
 
@@ -65,11 +65,11 @@ https://rfam.xfam.org/
 ftp://ftp.ebi.ac.uk/pub/databases/Rfam
 
 
-## Usage 
+## Usage
 
 ```sortmerna --ref $DB --reads $IN --aligned $RR --other $NR --paired_out --log --sam --fastx --blast 1 --num_alignments 1 -m 4096 -a 16```
 
-## Description 
+## Description
 
 ```DIR="/opt/genome/qiita_dbs/sortmerna/rna-depletion/" ```
 
@@ -94,11 +94,9 @@ Reference database(s) and their corresponding indexes separated by "," and multi
 ## Parameters ##
 
 
-**--paired**  use only if you have an interleaved FASTA/Q file 
+**--paired**  use only if you have an interleaved FASTA/Q file
 
 **--sam**   option also outputs the SAM alignment files
-
-**-a**  Threads to use
 
 **--aligned**   aligned reads filepath (in this case, ribosomal reads)
 
@@ -108,12 +106,12 @@ Reference database(s) and their corresponding indexes separated by "," and multi
 
 **-m**    Mbytes for loading reads into memory (default 1024)
 
-**--num_alignments**  reports only the first n alignments per read reaching E-value 
+**--num_alignments**  reports only the first n alignments per read reaching E-value
 
 **--blast**   output alignments in various Blast-like formats                
    - 0   pairwise
    - 1   tabular (Blast -m 8 format)
-   - 2   tabular + column for CIGAR 
+   - 2   tabular + column for CIGAR
    - 3   tabular + columns for CIGAR and query coverage
 
 
@@ -130,4 +128,4 @@ Reference database(s) and their corresponding indexes separated by "," and multi
 
 [5] Ying Huang, Paul Gilna and Weizhong Li, "Identification of ribosomal RNA genes in metagenomic fragments". Bioinformatics (2009) 25:1338-1340
 
-[6] Céline Mercier et al., SUMATRA and SUMACLUST: fast and exact comparison and clustering of full-length barcode sequences. 
+[6] Céline Mercier et al., SUMATRA and SUMACLUST: fast and exact comparison and clustering of full-length barcode sequences.
