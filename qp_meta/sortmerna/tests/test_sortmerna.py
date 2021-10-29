@@ -53,7 +53,6 @@ class QC_SortmernaTests(PluginTestCase):
     def test_format_sortmerna_params(self):
         obs = _format_params(self.params, SORTMERNA_PARAMS)
         exp = (
-               '-a 5 '
                '--blast 1 '
                '-m 3988 '
                '--num_alignments 1'
@@ -201,7 +200,7 @@ class QC_SortmernaTests(PluginTestCase):
         with open(f'{out_dir}/sortmerna.array-details') as f:
             details = f.readlines()
         exp_details = [
-            f'unpigz -p 5 -c {adir}/S22205_S104_L001_R1_001.fastq.gz > '
+            f'unpigz -p 10 -c {adir}/S22205_S104_L001_R1_001.fastq.gz > '
             f'{out_dir}/S22205_S104_L001_R1_001.fastq && sortmerna --ref '
             f'{RNA_REF_DB} --reads {out_dir}/S22205_S104_L001_R1_001.fastq '
             f'--aligned {out_dir}/S22205_S104.ribosomal.R1 --other '
@@ -211,7 +210,7 @@ class QC_SortmernaTests(PluginTestCase):
             f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz && pigz -p 5 -c '
             f'{out_dir}/S22205_S104.nonribosomal.R1.fastq > '
             f'{out_dir}/S22205_S104.nonribosomal.R1.fastq.gz;\n',
-            f'unpigz -p 5 -c {adir}/S22205_S104_L001_R2_001.fastq.gz > '
+            f'unpigz -p 10 -c {adir}/S22205_S104_L001_R2_001.fastq.gz > '
             f'{out_dir}/S22205_S104_L001_R2_001.fastq && sortmerna --ref '
             f'{RNA_REF_DB} --reads {out_dir}/S22205_S104_L001_R2_001.fastq '
             f'--aligned {out_dir}/S22205_S104.ribosomal.R2 --other '
@@ -221,7 +220,7 @@ class QC_SortmernaTests(PluginTestCase):
             f'{out_dir}/S22205_S104.ribosomal.R2.fastq.gz && pigz -p 5 -c '
             f'{out_dir}/S22205_S104.nonribosomal.R2.fastq > '
             f'{out_dir}/S22205_S104.nonribosomal.R2.fastq.gz;\n',
-            f'unpigz -p 5 -c {adir}/S22282_S102_L001_R1_001.fastq.gz > '
+            f'unpigz -p 10 -c {adir}/S22282_S102_L001_R1_001.fastq.gz > '
             f'{out_dir}/S22282_S102_L001_R1_001.fastq && sortmerna --ref '
             f'{RNA_REF_DB} --reads {out_dir}/S22282_S102_L001_R1_001.fastq '
             f'--aligned {out_dir}/S22282_S102.ribosomal.R1 --other '
@@ -231,7 +230,7 @@ class QC_SortmernaTests(PluginTestCase):
             f'{out_dir}/S22282_S102.ribosomal.R1.fastq.gz && pigz -p 5 -c '
             f'{out_dir}/S22282_S102.nonribosomal.R1.fastq > '
             f'{out_dir}/S22282_S102.nonribosomal.R1.fastq.gz;\n',
-            f'unpigz -p 5 -c {adir}/S22282_S102_L001_R2_001.fastq.gz > '
+            f'unpigz -p 10 -c {adir}/S22282_S102_L001_R2_001.fastq.gz > '
             f'{out_dir}/S22282_S102_L001_R2_001.fastq && sortmerna --ref '
             f'{RNA_REF_DB} --reads {out_dir}/S22282_S102_L001_R2_001.fastq '
             f'--aligned {out_dir}/S22282_S102.ribosomal.R2 --other '
@@ -368,7 +367,7 @@ class QC_SortmernaTests(PluginTestCase):
         with open(f'{out_dir}/sortmerna.array-details') as f:
             details = f.readlines()
         exp_details = [
-            f'unpigz -p 5 -c {adir}/S22205_S104_L001_R1_001.fastq.gz > '
+            f'unpigz -p 10 -c {adir}/S22205_S104_L001_R1_001.fastq.gz > '
             f'{out_dir}/S22205_S104_L001_R1_001.fastq && sortmerna --ref '
             f'{RNA_REF_DB} --reads {out_dir}/S22205_S104_L001_R1_001.fastq '
             f'--aligned {out_dir}/S22205_S104.ribosomal.R1 --other '
@@ -378,7 +377,7 @@ class QC_SortmernaTests(PluginTestCase):
             f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz && pigz -p 5 -c '
             f'{out_dir}/S22205_S104.nonribosomal.R1.fastq > '
             f'{out_dir}/S22205_S104.nonribosomal.R1.fastq.gz;\n',
-            f'unpigz -p 5 -c {adir}/S22282_S102_L001_R1_001.fastq.gz > '
+            f'unpigz -p 10 -c {adir}/S22282_S102_L001_R1_001.fastq.gz > '
             f'{out_dir}/S22282_S102_L001_R1_001.fastq && sortmerna --ref '
             f'{RNA_REF_DB} --reads {out_dir}/S22282_S102_L001_R1_001.fastq '
             f'--aligned {out_dir}/S22282_S102.ribosomal.R1 --other '
