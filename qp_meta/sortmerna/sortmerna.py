@@ -191,7 +191,7 @@ def sortmerna_to_array(files, out_dir, params, prep_info, url, job_id):
     commands, samples = generate_sortmerna_commands(
         files['raw_forward_seqs'], reverse_seqs, prep_file, out_dir, params)
 
-    # writting the job array details
+    # writing the job array details
     details_name = join(out_dir, 'sortmerna.array-details')
     with open(details_name, 'w') as details:
         details.write('\n'.join(commands))
