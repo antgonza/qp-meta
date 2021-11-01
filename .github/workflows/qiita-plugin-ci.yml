@@ -13,7 +13,7 @@ jobs:
     services:
       postgres:
         # Docker Hub image
-        image: postgres:9.5
+        image: postgres:13.4
         env:
           POSTGRES_DB: postgres
           POSTGRES_USER: postgres
@@ -71,13 +71,18 @@ jobs:
         shell: bash -l {0}
         run: |
           conda activate qiita
+          export QIITA_SERVER_CERT=`pwd`/qiita-dev/qiita_core/support_files/server.crt
+          export QIITA_CONFIG_FP=`pwd`/qiita-dev/qiita_core/support_files/config_test.cfg
           pip install qiita-dev/ --no-binary redbiom
           mkdir ~/.qiita_plugins
 
       - name: Install Qiita plugins
         shell: bash -l {0}
         run: |
-          conda create -q --yes -n qp-meta biom-format bowtie2 sortmerna=2.1b samtools pigz
+          conda config --add channels anaconda
+          conda config --add channels conda-forge
+          conda config --add channels bioconda
+          conda create -q --yes -n qp-meta biom-format sortmerna=2.1b samtools pigz
           conda activate qp-meta
 
           export QIITA_SERVER_CERT=`pwd`/qiita-dev/qiita_core/support_files/server.crt
@@ -91,10 +96,7 @@ jobs:
           for file in $(ls); do gunzip $file; done
           popd
 
-          bowtie2_version=`bowtie2 --version`
-          if [[ $bowtie2_version != *"2.4.2"* ]]; then echo "wrong bowtie2 version", $bowtie2_version; exit 1; fi
-
-          configure_meta --env-script "source /home/runner/.profile; conda activate qp-meta; export ENVIRONMENT=\"source /home/runner/.profile; conda activate qp-meta\"" --server-cert $QIITA_SERVER_CERT
+          configure_meta --env-script "source /home/runner/.profile; conda activate qp-meta; export QC_SORTMERNA_DB_DP=$PWD/qp_meta/sortmerna/databases/rRNA_databases/; export ENVIRONMENT=\"source /home/runner/.profile; conda activate qp-meta\"" --server-cert $QIITA_SERVER_CERT
 
           echo "Available Qiita plugins"
           ls ~/.qiita_plugins/
@@ -136,11 +138,15 @@ jobs:
           COVER_PACKAGE: ${{ matrix.cover_package }}
         run: |
           conda activate qp-meta
+
+          export QIITA_SERVER_CERT=`pwd`/qiita-dev/qiita_core/support_files/server.crt
+          export QIITA_CONFIG_FP=`pwd`/qiita-dev/qiita_core/support_files/config_test_local.cfg
           export QC_SORTMERNA_DB_DP=$PWD/qp_meta/sortmerna/databases/rRNA_databases/
+          export ENVIRONMENT="source /home/runner/.profile; conda activate qp-meta"
 
           export PYTHONWARNINGS="ignore:Certificate for localhost has no \`subjectAltName\`"
 
-          nosetests --with-doctest --with-coverage --with-timer -vv --cover-package=qp_meta
+          nosetests --with-doctest --with-coverage --cover-package=qp_meta
 
       - uses: codecov/codecov-action@v1
         with:
@@ -161,4 +167,4 @@ jobs:
     - name: lint
       run: |
         pip install -q flake8
-        flake8 qp_meta setup.py scripts
+        flake8 qp_meta setup.py scripts/*

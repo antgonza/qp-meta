@@ -9,10 +9,9 @@
 from qiita_client import QiitaPlugin
 
 from .sortmerna import sortmerna_cmd
-
+from .utils import plugin_details
 
 # Initialize the plugin
-plugin = QiitaPlugin(
-    'qp-meta', '2021.01', 'meta analysis tools for shotgun data')
+plugin = QiitaPlugin(**plugin_details)
 
 plugin.register_command(sortmerna_cmd)
