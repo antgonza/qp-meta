@@ -62,7 +62,7 @@ jobs:
 
           # Setting up main qiita conda environment
           conda config --add channels conda-forge
-          conda create -q --yes -n qiita python=3.6 pip==9.0.3 libgfortran numpy nginx cython redis
+          conda create -q --yes -n qiita python=3.9 pip==9.0.3 libgfortran numpy nginx cython redis
           conda activate qiita
           pip install --upgrade pip
           pip install sphinx sphinx-bootstrap-theme nose-timer codecov Click
@@ -82,7 +82,7 @@ jobs:
           conda config --add channels anaconda
           conda config --add channels conda-forge
           conda config --add channels bioconda
-          conda create -q --yes -n qp-meta biom-format sortmerna=2.1b samtools pigz
+          conda create -q --yes -n qp-meta python=3.9 biom-format sortmerna=2.1b samtools pigz
           conda activate qp-meta
 
           export QIITA_SERVER_CERT=`pwd`/qiita-dev/qiita_core/support_files/server.crt
