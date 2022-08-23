@@ -199,52 +199,54 @@ def sortmerna_to_array(files, out_dir, params, prep_info, url, job_id):
 
     # all the setup pieces
     lines = ['#!/bin/bash',
-             '#PBS -M qiita.help@gmail.com',
-             f'#PBS -N {job_id}',
-             f'#PBS -l nodes=1:ppn={PPN}',
-             f'#PBS -l walltime={WALLTIME}',
-             f'#PBS -l mem={MEMORY}',
-             f'#PBS -o {out_dir}/{job_id}' + '_${PBS_ARRAYID}.log',
-             f'#PBS -e {out_dir}/{job_id}' + '_${PBS_ARRAYID}.err',
-             f'#PBS -t 1-{n_jobs}%{MAX_RUNNING}',
-             '#PBS -l epilogue=/home/qiita/qiita-epilogue.sh',
+             '#SBATCH -p qiita',
+             '#SBATCH --mail-user qiita.help@gmail.com',
+             f'#SBATCH --job-name {job_id}',
+             '#SBATCH -N 1',
+             f'#SBATCH -n {PPN}',
+             f'#SBATCH --time {WALLTIME}',
+             f'#SBATCH --mem {MEMORY}',
+             f'#SBATCH --output {out_dir}/{job_id}_%a.log',
+             f'#SBATCH --error {out_dir}/{job_id}_%a.err',
+             f'#SBATCH --array 1-{n_jobs}%{MAX_RUNNING}',
              'set -e',
              f'cd {out_dir}',
              f'{params["environment"]}',
              'date',  # start time
              'hostname',  # executing system
-             'echo ${PBS_JOBID} ${PBS_ARRAYID}',
-             'offset=${PBS_ARRAYID}',
+             'echo ${SLURM_JOBID} ${SLURM_ARRAY_TASK_ID}',
+             'offset=${SLURM_ARRAY_TASK_ID}',
              'step=$(( $offset - 0 ))',
              f'cmd=$(head -n $step {details_name} | tail -n 1)',
              'eval $cmd',
              'set +e',
              'date']
-    main_qsub_fp = join(out_dir, f'{job_id}.qsub')
-    with open(main_qsub_fp, 'w') as job:
+    main_fp = join(out_dir, f'{job_id}.qsub')
+    with open(main_fp, 'w') as job:
         job.write('\n'.join(lines))
         job.write('\n')
 
     # finish job
     lines = ['#!/bin/bash',
-             '#PBS -M qiita.help@gmail.com',
-             f'#PBS -N finish-{job_id}',
-             '#PBS -l nodes=1:ppn=1',
-             f'#PBS -l walltime={FINISH_WALLTIME}',
-             f'#PBS -l mem={FINISH_MEMORY}',
-             f'#PBS -o {out_dir}/finish-{job_id}.log',
-             f'#PBS -e {out_dir}/finish-{job_id}.err',
-             '#PBS -l epilogue=/home/qiita/qiita-epilogue.sh',
+             '#SBATCH -p qiita',
+             '#SBATCH --mail-user qiita.help@gmail.com',
+             f'#SBATCH --job-name finish-{job_id}',
+             '#SBATCH -N 1',
+             '#SBATCH -n 1',
+             f'#SBATCH --time {FINISH_WALLTIME}',
+             f'#SBATCH --mem {FINISH_MEMORY}',
+             f'#SBATCH --output {out_dir}/finish-{job_id}.log',
+             f'#SBATCH --error {out_dir}/finish-{job_id}.err',
              'set -e',
              f'cd {out_dir}',
              f'{params["environment"]}',
              'date',  # start time
              'hostname',  # executing system
-             'echo $PBS_JOBID',
+             'echo $SLURM_JOBID',
              f'finish_sortmerna {url} {job_id} {out_dir}\n'
              "date"]
-    finish_qsub_fp = join(out_dir, f'{job_id}.finish.qsub')
-    with open(finish_qsub_fp, 'w') as out:
+    finish_fp = join(out_dir, f'{job_id}.finish.qsub')
+    with open(finish_fp, 'w') as out:
         out.write('\n'.join(lines))
         out.write('\n')
 
@@ -253,4 +255,4 @@ def sortmerna_to_array(files, out_dir, params, prep_info, url, job_id):
         out.write('\n'.join(
             ['\t'.join([ss for ss in s if ss is not None]) for s in samples]))
 
-    return main_qsub_fp, finish_qsub_fp, samples_fp
+    return main_fp, finish_fp, samples_fp

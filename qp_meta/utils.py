@@ -116,7 +116,7 @@ def make_read_pairs_per_sample(forward_seqs, reverse_seqs, map_file):
 
         used_prefixes.add(run_prefix)
 
-    return(samples)
+    return (samples)
 
 
 def _format_params(parameters, func_params):
@@ -139,7 +139,7 @@ def _format_params(parameters, func_params):
 
     param_string = ' '.join(params)
 
-    return(param_string)
+    return (param_string)
 
 
 def _run_commands(qclient, job_id, commands, msg, cmd_name):

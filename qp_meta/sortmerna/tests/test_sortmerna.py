@@ -125,67 +125,69 @@ class QC_SortmernaTests(PluginTestCase):
         self._clean_up_files.append(out_dir)
         url = 'this-is-my-url'
 
-        main_qsub_fp, finish_qsub_fp, samples_fp = sortmerna_to_array(
+        main_fp, finish_fp, samples_fp = sortmerna_to_array(
             artifact_info['files'], out_dir, self.params, prep_file,
             url, job_id)
 
         od = partial(join, out_dir)
-        self.assertEqual(od(f'{job_id}.qsub'), main_qsub_fp)
-        self.assertEqual(od(f'{job_id}.finish.qsub'), finish_qsub_fp)
+        self.assertEqual(od(f'{job_id}.qsub'), main_fp)
+        self.assertEqual(od(f'{job_id}.finish.qsub'), finish_fp)
         self.assertEqual(od(f'{job_id}.samples.tsv'), samples_fp)
 
-        with open(main_qsub_fp) as f:
-            main_qsub = f.readlines()
-        with open(finish_qsub_fp) as f:
-            finish_qsub = f.readlines()
+        with open(main_fp) as f:
+            main = f.readlines()
+        with open(finish_fp) as f:
+            finish = f.readlines()
         with open(samples_fp) as f:
             samples = f.readlines()
 
-        exp_main_qsub = [
+        exp_main = [
             '#!/bin/bash\n',
-            '#PBS -M qiita.help@gmail.com\n',
-            f'#PBS -N {job_id}\n',
-            '#PBS -l nodes=1:ppn=10\n',
-            '#PBS -l walltime=30:00:00\n',
-            '#PBS -l mem=40g\n',
-            f'#PBS -o {out_dir}/{job_id}_${{PBS_ARRAYID}}.log\n',
-            f'#PBS -e {out_dir}/{job_id}_${{PBS_ARRAYID}}.err\n',
-            '#PBS -t 1-4%8\n',
-            '#PBS -l epilogue=/home/qiita/qiita-epilogue.sh\n',
+            '#SBATCH -p qiita\n',
+            '#SBATCH --mail-user qiita.help@gmail.com\n',
+            f'#SBATCH --job-name {job_id}\n',
+            '#SBATCH -N 1\n',
+            '#SBATCH -n 10\n',
+            '#SBATCH --time 30:00:00\n',
+            '#SBATCH --mem 40g\n',
+            f'#SBATCH --output {out_dir}/{job_id}_%a.log\n',
+            f'#SBATCH --error {out_dir}/{job_id}_%a.err\n',
+            '#SBATCH --array 1-4%8\n',
             'set -e\n',
             f'cd {out_dir}\n',
             f'{self.params["environment"]}\n',
             'date\n',
             'hostname\n',
-            'echo ${PBS_JOBID} ${PBS_ARRAYID}\n',
-            'offset=${PBS_ARRAYID}\n',
+            'echo ${SLURM_JOBID} ${SLURM_ARRAY_TASK_ID}\n',
+            'offset=${SLURM_ARRAY_TASK_ID}\n',
             'step=$(( $offset - 0 ))\n',
             f'cmd=$(head -n $step {out_dir}/sortmerna.array-details | '
             'tail -n 1)\n',
             'eval $cmd\n',
             'set +e\n',
             'date\n']
-        self.assertEqual(main_qsub, exp_main_qsub)
+        self.assertEqual(main, exp_main)
 
-        exp_finish_qsub = [
+        exp_finish = [
             '#!/bin/bash\n',
-            '#PBS -M qiita.help@gmail.com\n',
-            f'#PBS -N finish-{job_id}\n',
-            '#PBS -l nodes=1:ppn=1\n',
-            '#PBS -l walltime=10:00:00\n',
-            '#PBS -l mem=48g\n',
-            f'#PBS -o {out_dir}/finish-{job_id}.log\n',
-            f'#PBS -e {out_dir}/finish-{job_id}.err\n',
-            '#PBS -l epilogue=/home/qiita/qiita-epilogue.sh\n',
+            '#SBATCH -p qiita\n',
+            '#SBATCH --mail-user qiita.help@gmail.com\n',
+            f'#SBATCH --job-name finish-{job_id}\n',
+            '#SBATCH -N 1\n',
+            '#SBATCH -n 1\n',
+            '#SBATCH --time 10:00:00\n',
+            '#SBATCH --mem 48g\n',
+            f'#SBATCH --output {out_dir}/finish-{job_id}.log\n',
+            f'#SBATCH --error {out_dir}/finish-{job_id}.err\n',
             'set -e\n',
             f'cd {out_dir}\n',
             f'{self.params["environment"]}\n',
             'date\n',
             'hostname\n',
-            'echo $PBS_JOBID\n',
+            'echo $SLURM_JOBID\n',
             f'finish_sortmerna {url} {job_id} {out_dir}\n',
             'date\n']
-        self.assertEqual(finish_qsub, exp_finish_qsub)
+        self.assertEqual(finish, exp_finish)
 
         adir = dirname(artifact_info['files']['raw_forward_seqs'][0])
         exp_samples = [
@@ -294,67 +296,69 @@ class QC_SortmernaTests(PluginTestCase):
         self._clean_up_files.append(out_dir)
         url = 'this-is-my-url'
 
-        main_qsub_fp, finish_qsub_fp, samples_fp = sortmerna_to_array(
+        main_fp, finish_fp, samples_fp = sortmerna_to_array(
             artifact_info['files'], out_dir, self.params, prep_file,
             url, job_id)
 
         od = partial(join, out_dir)
-        self.assertEqual(od(f'{job_id}.qsub'), main_qsub_fp)
-        self.assertEqual(od(f'{job_id}.finish.qsub'), finish_qsub_fp)
+        self.assertEqual(od(f'{job_id}.qsub'), main_fp)
+        self.assertEqual(od(f'{job_id}.finish.qsub'), finish_fp)
         self.assertEqual(od(f'{job_id}.samples.tsv'), samples_fp)
 
-        with open(main_qsub_fp) as f:
-            main_qsub = f.readlines()
-        with open(finish_qsub_fp) as f:
-            finish_qsub = f.readlines()
+        with open(main_fp) as f:
+            main = f.readlines()
+        with open(finish_fp) as f:
+            finish = f.readlines()
         with open(samples_fp) as f:
             samples = f.readlines()
 
-        exp_main_qsub = [
+        exp_main = [
             '#!/bin/bash\n',
-            '#PBS -M qiita.help@gmail.com\n',
-            f'#PBS -N {job_id}\n',
-            '#PBS -l nodes=1:ppn=10\n',
-            '#PBS -l walltime=30:00:00\n',
-            '#PBS -l mem=40g\n',
-            f'#PBS -o {out_dir}/{job_id}_${{PBS_ARRAYID}}.log\n',
-            f'#PBS -e {out_dir}/{job_id}_${{PBS_ARRAYID}}.err\n',
-            '#PBS -t 1-2%8\n',
-            '#PBS -l epilogue=/home/qiita/qiita-epilogue.sh\n',
+            '#SBATCH -p qiita\n',
+            '#SBATCH --mail-user qiita.help@gmail.com\n',
+            f'#SBATCH --job-name {job_id}\n',
+            '#SBATCH -N 1\n',
+            '#SBATCH -n 10\n',
+            '#SBATCH --time 30:00:00\n',
+            '#SBATCH --mem 40g\n',
+            f'#SBATCH --output {out_dir}/{job_id}_%a.log\n',
+            f'#SBATCH --error {out_dir}/{job_id}_%a.err\n',
+            '#SBATCH --array 1-2%8\n',
             'set -e\n',
             f'cd {out_dir}\n',
             f'{self.params["environment"]}\n',
             'date\n',
             'hostname\n',
-            'echo ${PBS_JOBID} ${PBS_ARRAYID}\n',
-            'offset=${PBS_ARRAYID}\n',
+            'echo ${SLURM_JOBID} ${SLURM_ARRAY_TASK_ID}\n',
+            'offset=${SLURM_ARRAY_TASK_ID}\n',
             'step=$(( $offset - 0 ))\n',
             f'cmd=$(head -n $step {out_dir}/sortmerna.array-details | '
             'tail -n 1)\n',
             'eval $cmd\n',
             'set +e\n',
             'date\n']
-        self.assertEqual(main_qsub, exp_main_qsub)
+        self.assertEqual(main, exp_main)
 
-        exp_finish_qsub = [
+        exp_finish = [
             '#!/bin/bash\n',
-            '#PBS -M qiita.help@gmail.com\n',
-            f'#PBS -N finish-{job_id}\n',
-            '#PBS -l nodes=1:ppn=1\n',
-            '#PBS -l walltime=10:00:00\n',
-            '#PBS -l mem=48g\n',
-            f'#PBS -o {out_dir}/finish-{job_id}.log\n',
-            f'#PBS -e {out_dir}/finish-{job_id}.err\n',
-            '#PBS -l epilogue=/home/qiita/qiita-epilogue.sh\n',
+            '#SBATCH -p qiita\n',
+            '#SBATCH --mail-user qiita.help@gmail.com\n',
+            f'#SBATCH --job-name finish-{job_id}\n',
+            '#SBATCH -N 1\n',
+            '#SBATCH -n 1\n',
+            '#SBATCH --time 10:00:00\n',
+            '#SBATCH --mem 48g\n',
+            f'#SBATCH --output {out_dir}/finish-{job_id}.log\n',
+            f'#SBATCH --error {out_dir}/finish-{job_id}.err\n',
             'set -e\n',
             f'cd {out_dir}\n',
             f'{self.params["environment"]}\n',
             'date\n',
             'hostname\n',
-            'echo $PBS_JOBID\n',
+            'echo $SLURM_JOBID\n',
             f'finish_sortmerna {url} {job_id} {out_dir}\n',
             'date\n']
-        self.assertEqual(finish_qsub, exp_finish_qsub)
+        self.assertEqual(finish, exp_finish)
 
         adir = dirname(artifact_info['files']['raw_forward_seqs'][0])
         exp_samples = [
