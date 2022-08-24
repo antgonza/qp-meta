@@ -130,8 +130,8 @@ class QC_SortmernaTests(PluginTestCase):
             url, job_id)
 
         od = partial(join, out_dir)
-        self.assertEqual(od(f'{job_id}.qsub'), main_fp)
-        self.assertEqual(od(f'{job_id}.finish.qsub'), finish_fp)
+        self.assertEqual(od(f'{job_id}.slurm'), main_fp)
+        self.assertEqual(od(f'{job_id}.finish.slurm'), finish_fp)
         self.assertEqual(od(f'{job_id}.samples.tsv'), samples_fp)
 
         with open(main_fp) as f:
@@ -301,8 +301,8 @@ class QC_SortmernaTests(PluginTestCase):
             url, job_id)
 
         od = partial(join, out_dir)
-        self.assertEqual(od(f'{job_id}.qsub'), main_fp)
-        self.assertEqual(od(f'{job_id}.finish.qsub'), finish_fp)
+        self.assertEqual(od(f'{job_id}.slurm'), main_fp)
+        self.assertEqual(od(f'{job_id}.finish.slurm'), finish_fp)
         self.assertEqual(od(f'{job_id}.samples.tsv'), samples_fp)
 
         with open(main_fp) as f:

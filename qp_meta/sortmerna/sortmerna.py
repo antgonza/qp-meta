@@ -180,7 +180,7 @@ def sortmerna(qclient, job_id, parameters, out_dir):
 
 
 def sortmerna_to_array(files, out_dir, params, prep_info, url, job_id):
-    """Creates qsub files for submission of per sample bowtie2 and woltka
+    """Creates slurm files for submission of per sample bowtie2 and woltka
     """
     prep_file = _generate_qiime_mapping_file(prep_info, out_dir)
 
@@ -221,7 +221,7 @@ def sortmerna_to_array(files, out_dir, params, prep_info, url, job_id):
              'eval $cmd',
              'set +e',
              'date']
-    main_fp = join(out_dir, f'{job_id}.qsub')
+    main_fp = join(out_dir, f'{job_id}.slurm')
     with open(main_fp, 'w') as job:
         job.write('\n'.join(lines))
         job.write('\n')
@@ -245,7 +245,7 @@ def sortmerna_to_array(files, out_dir, params, prep_info, url, job_id):
              'echo $SLURM_JOBID',
              f'finish_sortmerna {url} {job_id} {out_dir}\n'
              "date"]
-    finish_fp = join(out_dir, f'{job_id}.finish.qsub')
+    finish_fp = join(out_dir, f'{job_id}.finish.slurm')
     with open(finish_fp, 'w') as out:
         out.write('\n'.join(lines))
         out.write('\n')
