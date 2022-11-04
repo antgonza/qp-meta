@@ -156,7 +156,8 @@ def _run_commands(qclient, job_id, commands, msg, cmd_name):
 
 
 def _per_sample_ainfo(
-        out_dir, samples, suffixes, files_type_name, fwd_and_rev=False):
+        out_dir, samples, suffixes, files_type_name, fwd_and_rev=False,
+        add_logs=False):
     files = []
     missing_files = []
     smd = partial(join, out_dir)
@@ -180,6 +181,11 @@ def _per_sample_ainfo(
         # Command did not create any files, which means that no sequence
         # was kept after quality control and filtering for host data
         raise ValueError("No files were generated %s")
+
+    if add_logs:
+        logs = glob(f'{smd}/*.log')
+        for l in logs:
+            files.append((l, 'log'))
 
     return ArtifactInfo(files_type_name, 'per_sample_FASTQ', files)
 
