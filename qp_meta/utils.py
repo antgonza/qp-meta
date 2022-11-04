@@ -18,6 +18,7 @@ from os.path import basename, join, exists, expanduser
 from configparser import ConfigParser
 from functools import partial
 from qiita_client import ArtifactInfo, QiitaClient
+from glob import glob
 
 
 plugin_details = {'name': 'qp-meta',
@@ -184,8 +185,8 @@ def _per_sample_ainfo(
 
     if add_logs:
         logs = glob(f'{smd}/*.log')
-        for l in logs:
-            files.append((l, 'log'))
+        for log in logs:
+            files.append((log, 'log'))
 
     return ArtifactInfo(files_type_name, 'per_sample_FASTQ', files)
 
