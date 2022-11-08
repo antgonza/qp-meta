@@ -175,7 +175,7 @@ def _per_sample_ainfo(
                     # to reproduce so no tests!
                     raise ValueError('File %s has an unexpected name' % fname)
                 files.append((fname, ftype))
-                logs.append(fname.replace('.fastq.gz', '.log'))
+                logs.append(basename(fname).replace('.fastq.gz', '.log'))
             else:
                 missing_files.append(fname)
 
@@ -186,7 +186,7 @@ def _per_sample_ainfo(
 
     if add_logs:
         logs_fp = smd('artifact.logs.tgz')
-        cmd = f'tar zcvf {logs_fp} %s' % ' '.join(logs)
+        cmd = f'cd {smd()}; tar zcvf {logs_fp} %s' % ' '.join(logs)
         std_out, std_err, return_value = system_call(cmd)
         if return_value != 0:
             error_msg = ("Error running compressing logs:\nStd out: %s\n"
