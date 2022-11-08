@@ -253,7 +253,8 @@ class QC_SortmernaTests(PluginTestCase):
                 (f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz',
                  'raw_forward_seqs'),
                 (f'{out_dir}/S22205_S104.ribosomal.R2.fastq.gz',
-                 'raw_reverse_seqs')]
+                 'raw_reverse_seqs'),
+                (f'{out_dir}/artifact.logs.tgz', 'log')]
         nribo = [(f'{out_dir}/S22282_S102.nonribosomal.R1.fastq.gz',
                   'raw_forward_seqs'),
                  (f'{out_dir}/S22282_S102.nonribosomal.R2.fastq.gz',
@@ -263,7 +264,10 @@ class QC_SortmernaTests(PluginTestCase):
                  (f'{out_dir}/S22205_S104.nonribosomal.R2.fastq.gz',
                   'raw_reverse_seqs')]
         for f in ribo + nribo:
+            if f[1] == 'log':
+                continue
             copyfile(infile, f[0])
+            copyfile(infile, f[0].replace('fastq.gz', 'log'))
         success, ainfo, msg = sortmerna(
             self.qclient, job_id, self.params, out_dir)
 
@@ -398,13 +402,17 @@ class QC_SortmernaTests(PluginTestCase):
         ribo = [(f'{out_dir}/S22282_S102.ribosomal.R1.fastq.gz',
                  'raw_forward_seqs'),
                 (f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz',
-                 'raw_forward_seqs')]
+                 'raw_forward_seqs'),
+                (f'{out_dir}/artifact.logs.tgz', 'log')]
         nribo = [(f'{out_dir}/S22282_S102.nonribosomal.R1.fastq.gz',
                   'raw_forward_seqs'),
                  (f'{out_dir}/S22205_S104.nonribosomal.R1.fastq.gz',
                   'raw_forward_seqs')]
         for f in ribo + nribo:
+            if f[1] == 'log':
+                continue
             copyfile(infile, f[0])
+            copyfile(infile, f[0].replace('fastq.gz', 'log'))
         success, ainfo, msg = sortmerna(
             self.qclient, job_id, self.params, out_dir)
 
