@@ -156,10 +156,12 @@ def _run_commands(qclient, job_id, commands, msg, cmd_name):
 
 
 def _per_sample_ainfo(
-        out_dir, samples, suffixes, files_type_name, fwd_and_rev=False):
+        out_dir, samples, suffixes, files_type_name, fwd_and_rev=False,
+        add_logs=False):
     files = []
     missing_files = []
     smd = partial(join, out_dir)
+    logs = []
     for rp, _, _, _ in samples:
         for suff in suffixes:
             fname = smd(suff % rp)
@@ -173,6 +175,7 @@ def _per_sample_ainfo(
                     # to reproduce so no tests!
                     raise ValueError('File %s has an unexpected name' % fname)
                 files.append((fname, ftype))
+                logs.append(basename(fname).replace('.fastq.gz', '.log'))
             else:
                 missing_files.append(fname)
 
@@ -180,6 +183,18 @@ def _per_sample_ainfo(
         # Command did not create any files, which means that no sequence
         # was kept after quality control and filtering for host data
         raise ValueError("No files were generated %s")
+
+    if add_logs:
+        logs_fp = smd('artifact.logs.tgz')
+        cmd = f'cd {smd()}; tar zcvf {logs_fp} %s' % ' '.join(logs)
+        std_out, std_err, return_value = system_call(cmd)
+        if return_value != 0:
+            error_msg = ("Error running compressing logs:\nStd out: %s\n"
+                         "Std err: %s\n\nCommand run was:\n%s" % (
+                            std_out, std_err, cmd))
+            return False, error_msg
+
+        files.append((logs_fp, 'log'))
 
     return ArtifactInfo(files_type_name, 'per_sample_FASTQ', files)
 

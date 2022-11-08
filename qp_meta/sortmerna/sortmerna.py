@@ -95,7 +95,7 @@ def generate_sortmerna_commands(forward_seqs, reverse_seqs, map_file,
     template = ("unpigz -p {thrds} -c {ip} > {ip_unpigz} && "
                 "sortmerna --ref {ref_db} --reads {ip_unpigz} "
                 "--aligned {smr_r_op} --other {smr_nr_op} "
-                "--fastx -a {thrds} {params} && "
+                "--fastx -a {thrds} {params} --log && "
                 "pigz -p {thrds} -c {smr_r_op}.fastq > {smr_r_op_gz} && "
                 "pigz -p {thrds} -c {smr_nr_op}.fastq > {smr_nr_op_gz};"
                 )
@@ -174,7 +174,7 @@ def sortmerna(qclient, job_id, parameters, out_dir):
     suffixes = ['%s.ribosomal.R1.fastq.gz', '%s.ribosomal.R2.fastq.gz']
     file_type_name = 'Ribosomal reads'
     ainfo.append(_per_sample_ainfo(
-        out_dir, samples, suffixes, file_type_name, reverse))
+        out_dir, samples, suffixes, file_type_name, reverse, add_logs=True))
 
     return True, ainfo, ""
 

@@ -207,7 +207,7 @@ class QC_SortmernaTests(PluginTestCase):
             f'{RNA_REF_DB} --reads {out_dir}/S22205_S104_L001_R1_001.fastq '
             f'--aligned {out_dir}/S22205_S104.ribosomal.R1 --other '
             f'{out_dir}/S22205_S104.nonribosomal.R1 --fastx -a 10 --blast 1 '
-            '-m 3988 --num_alignments 1 && pigz -p 10 -c '
+            '-m 3988 --num_alignments 1 --log && pigz -p 10 -c '
             f'{out_dir}/S22205_S104.ribosomal.R1.fastq > '
             f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz && pigz -p 10 -c '
             f'{out_dir}/S22205_S104.nonribosomal.R1.fastq > '
@@ -217,7 +217,7 @@ class QC_SortmernaTests(PluginTestCase):
             f'{RNA_REF_DB} --reads {out_dir}/S22205_S104_L001_R2_001.fastq '
             f'--aligned {out_dir}/S22205_S104.ribosomal.R2 --other '
             f'{out_dir}/S22205_S104.nonribosomal.R2 --fastx -a 10 --blast 1 '
-            '-m 3988 --num_alignments 1 && pigz -p 10 -c '
+            '-m 3988 --num_alignments 1 --log && pigz -p 10 -c '
             f'{out_dir}/S22205_S104.ribosomal.R2.fastq > '
             f'{out_dir}/S22205_S104.ribosomal.R2.fastq.gz && pigz -p 10 -c '
             f'{out_dir}/S22205_S104.nonribosomal.R2.fastq > '
@@ -227,7 +227,7 @@ class QC_SortmernaTests(PluginTestCase):
             f'{RNA_REF_DB} --reads {out_dir}/S22282_S102_L001_R1_001.fastq '
             f'--aligned {out_dir}/S22282_S102.ribosomal.R1 --other '
             f'{out_dir}/S22282_S102.nonribosomal.R1 --fastx -a 10 --blast 1 '
-            '-m 3988 --num_alignments 1 && pigz -p 10 -c '
+            '-m 3988 --num_alignments 1 --log && pigz -p 10 -c '
             f'{out_dir}/S22282_S102.ribosomal.R1.fastq > '
             f'{out_dir}/S22282_S102.ribosomal.R1.fastq.gz && pigz -p 10 -c '
             f'{out_dir}/S22282_S102.nonribosomal.R1.fastq > '
@@ -237,7 +237,7 @@ class QC_SortmernaTests(PluginTestCase):
             f'{RNA_REF_DB} --reads {out_dir}/S22282_S102_L001_R2_001.fastq '
             f'--aligned {out_dir}/S22282_S102.ribosomal.R2 --other '
             f'{out_dir}/S22282_S102.nonribosomal.R2 --fastx -a 10 --blast 1 '
-            '-m 3988 --num_alignments 1 && pigz -p 10 -c '
+            '-m 3988 --num_alignments 1 --log && pigz -p 10 -c '
             f'{out_dir}/S22282_S102.ribosomal.R2.fastq > '
             f'{out_dir}/S22282_S102.ribosomal.R2.fastq.gz && pigz -p 10 -c '
             f'{out_dir}/S22282_S102.nonribosomal.R2.fastq > '
@@ -253,7 +253,8 @@ class QC_SortmernaTests(PluginTestCase):
                 (f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz',
                  'raw_forward_seqs'),
                 (f'{out_dir}/S22205_S104.ribosomal.R2.fastq.gz',
-                 'raw_reverse_seqs')]
+                 'raw_reverse_seqs'),
+                (f'{out_dir}/artifact.logs.tgz', 'log')]
         nribo = [(f'{out_dir}/S22282_S102.nonribosomal.R1.fastq.gz',
                   'raw_forward_seqs'),
                  (f'{out_dir}/S22282_S102.nonribosomal.R2.fastq.gz',
@@ -263,7 +264,10 @@ class QC_SortmernaTests(PluginTestCase):
                  (f'{out_dir}/S22205_S104.nonribosomal.R2.fastq.gz',
                   'raw_reverse_seqs')]
         for f in ribo + nribo:
+            if f[1] == 'log':
+                continue
             copyfile(infile, f[0])
+            copyfile(infile, f[0].replace('fastq.gz', 'log'))
         success, ainfo, msg = sortmerna(
             self.qclient, job_id, self.params, out_dir)
 
@@ -376,7 +380,7 @@ class QC_SortmernaTests(PluginTestCase):
             f'{RNA_REF_DB} --reads {out_dir}/S22205_S104_L001_R1_001.fastq '
             f'--aligned {out_dir}/S22205_S104.ribosomal.R1 --other '
             f'{out_dir}/S22205_S104.nonribosomal.R1 --fastx -a 10 --blast 1 '
-            '-m 3988 --num_alignments 1 && pigz -p 10 -c '
+            '-m 3988 --num_alignments 1 --log && pigz -p 10 -c '
             f'{out_dir}/S22205_S104.ribosomal.R1.fastq > '
             f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz && pigz -p 10 -c '
             f'{out_dir}/S22205_S104.nonribosomal.R1.fastq > '
@@ -386,7 +390,7 @@ class QC_SortmernaTests(PluginTestCase):
             f'{RNA_REF_DB} --reads {out_dir}/S22282_S102_L001_R1_001.fastq '
             f'--aligned {out_dir}/S22282_S102.ribosomal.R1 --other '
             f'{out_dir}/S22282_S102.nonribosomal.R1 --fastx -a 10 --blast 1 '
-            '-m 3988 --num_alignments 1 && pigz -p 10 -c '
+            '-m 3988 --num_alignments 1 --log && pigz -p 10 -c '
             f'{out_dir}/S22282_S102.ribosomal.R1.fastq > '
             f'{out_dir}/S22282_S102.ribosomal.R1.fastq.gz && pigz -p 10 -c '
             f'{out_dir}/S22282_S102.nonribosomal.R1.fastq > '
@@ -398,13 +402,17 @@ class QC_SortmernaTests(PluginTestCase):
         ribo = [(f'{out_dir}/S22282_S102.ribosomal.R1.fastq.gz',
                  'raw_forward_seqs'),
                 (f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz',
-                 'raw_forward_seqs')]
+                 'raw_forward_seqs'),
+                (f'{out_dir}/artifact.logs.tgz', 'log')]
         nribo = [(f'{out_dir}/S22282_S102.nonribosomal.R1.fastq.gz',
                   'raw_forward_seqs'),
                  (f'{out_dir}/S22205_S104.nonribosomal.R1.fastq.gz',
                   'raw_forward_seqs')]
         for f in ribo + nribo:
+            if f[1] == 'log':
+                continue
             copyfile(infile, f[0])
+            copyfile(infile, f[0].replace('fastq.gz', 'log'))
         success, ainfo, msg = sortmerna(
             self.qclient, job_id, self.params, out_dir)
 
