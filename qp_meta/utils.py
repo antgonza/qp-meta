@@ -18,7 +18,6 @@ from os.path import basename, join, exists, expanduser
 from configparser import ConfigParser
 from functools import partial
 from qiita_client import ArtifactInfo, QiitaClient
-from glob import glob
 
 
 plugin_details = {'name': 'qp-meta',
@@ -162,6 +161,7 @@ def _per_sample_ainfo(
     files = []
     missing_files = []
     smd = partial(join, out_dir)
+    logs = []
     for rp, _, _, _ in samples:
         for suff in suffixes:
             fname = smd(suff % rp)
@@ -175,6 +175,7 @@ def _per_sample_ainfo(
                     # to reproduce so no tests!
                     raise ValueError('File %s has an unexpected name' % fname)
                 files.append((fname, ftype))
+                logs.append(fname.replace('.fastq.gz', '.log'))
             else:
                 missing_files.append(fname)
 
@@ -184,7 +185,15 @@ def _per_sample_ainfo(
         raise ValueError("No files were generated %s")
 
     if add_logs:
-        logs = glob(f'{smd}/*.log')
+        logs_fp = smd('artifact.logs.tgz')
+        cmd = f'tar zcvf {logs_fp} %s' % ' '.join(logs)
+        std_out, std_err, return_value = system_call(cmd)
+        if return_value != 0:
+            error_msg = ("Error running compressing logs:\nStd out: %s\n"
+                         "Std err: %s\n\nCommand run was:\n%s" % (
+                            std_out, std_err, cmd))
+            return False, error_msg
+
         for log in logs:
             files.append((log, 'log'))
 
