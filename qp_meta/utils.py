@@ -194,8 +194,7 @@ def _per_sample_ainfo(
                             std_out, std_err, cmd))
             return False, error_msg
 
-        for log in logs:
-            files.append((log, 'log'))
+        files.append((logs_fp, 'log'))
 
     return ArtifactInfo(files_type_name, 'per_sample_FASTQ', files)
 
