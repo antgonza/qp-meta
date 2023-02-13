@@ -114,11 +114,12 @@ class QC_SortmernaTests(PluginTestCase):
         self.params['environment'] = environ["ENVIRONMENT"]
 
         # Get the artifact filepath information
-        artifact_info = self.qclient.get("/qiita_db/artifacts/%s/" % aid)
-
-        # Get the artifact metadata
-        prep_info = self.qclient.get('/qiita_db/prep_template/%s/' % pid)
-        prep_file = prep_info['prep-file']
+        files, prep = self.qclient.artifact_and_preparation_files(aid)
+        fps = {'raw_forward_seqs': [], 'raw_reverse_seqs': []}
+        for sn, fs in files.items():
+            fps['raw_forward_seqs'].append(fs[0]['filepath'])
+            if fs[1]:
+                fps['raw_reverse_seqs'].append(fs[1]['filepath'])
 
         # extra parameters
         out_dir = mkdtemp()
@@ -126,8 +127,7 @@ class QC_SortmernaTests(PluginTestCase):
         url = 'this-is-my-url'
 
         main_fp, finish_fp, samples_fp = sortmerna_to_array(
-            artifact_info['files'], out_dir, self.params, prep_file,
-            url, job_id)
+            fps, out_dir, self.params, prep, url, job_id)
 
         od = partial(join, out_dir)
         self.assertEqual(od(f'{job_id}.slurm'), main_fp)
@@ -189,7 +189,7 @@ class QC_SortmernaTests(PluginTestCase):
             'date\n']
         self.assertEqual(finish, exp_finish)
 
-        adir = dirname(artifact_info['files']['raw_forward_seqs'][0])
+        adir = dirname(fps['raw_forward_seqs'][0])
         exp_samples = [
             'S22205_S104\t1.SKB8.640193\t'
             f'{adir}/S22205_S104_L001_R1_001.fastq.gz\t'
@@ -289,11 +289,12 @@ class QC_SortmernaTests(PluginTestCase):
         self.params['environment'] = environ["ENVIRONMENT"]
 
         # Get the artifact filepath information
-        artifact_info = self.qclient.get("/qiita_db/artifacts/%s/" % aid)
-
-        # Get the artifact metadata
-        prep_info = self.qclient.get('/qiita_db/prep_template/%s/' % pid)
-        prep_file = prep_info['prep-file']
+        files, prep = self.qclient.artifact_and_preparation_files(aid)
+        fps = {'raw_forward_seqs': [], 'raw_reverse_seqs': []}
+        for sn, fs in files.items():
+            fps['raw_forward_seqs'].append(fs[0]['filepath'])
+            if fs[1]:
+                fps['raw_reverse_seqs'].append(fs[1]['filepath'])
 
         # extra parameters
         out_dir = mkdtemp()
@@ -301,8 +302,7 @@ class QC_SortmernaTests(PluginTestCase):
         url = 'this-is-my-url'
 
         main_fp, finish_fp, samples_fp = sortmerna_to_array(
-            artifact_info['files'], out_dir, self.params, prep_file,
-            url, job_id)
+            fps, out_dir, self.params, prep, url, job_id)
 
         od = partial(join, out_dir)
         self.assertEqual(od(f'{job_id}.slurm'), main_fp)
@@ -364,7 +364,7 @@ class QC_SortmernaTests(PluginTestCase):
             'date\n']
         self.assertEqual(finish, exp_finish)
 
-        adir = dirname(artifact_info['files']['raw_forward_seqs'][0])
+        adir = dirname(fps['raw_forward_seqs'][0])
         exp_samples = [
             'S22205_S104\t1.SKB8.640193\t'
             f'{adir}/S22205_S104_L001_R1_001.fastq.gz\n',

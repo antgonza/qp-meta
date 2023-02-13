@@ -39,14 +39,15 @@ def execute(url, job_id, out_dir):
 
         parameters['environment'] = environ["ENVIRONMENT"]
 
-        artifact_info = qclient.get("/qiita_db/artifacts/%s/" % artifact_id)
-        prep_info = qclient.get('/qiita_db/prep_template/%s/'
-                                % artifact_info['prep_information'][0])
-        prep_file = prep_info['prep-file']
+        files, prep = qclient.artifact_and_preparation_files(artifact_id)
+        fps = {'raw_forward_seqs': [], 'raw_reverse_seqs': []}
+        for sn, fs in files.items():
+            fps['raw_forward_seqs'].append(fs[0]['filepath'])
+            if fs[1]:
+                fps['raw_reverse_seqs'].append(fs[1]['filepath'])
 
         main_fp, finish_fp, samples_fp = sortmerna_to_array(
-            artifact_info['files'], out_dir, parameters, prep_file,
-            url, job_id)
+            fps, out_dir, parameters, prep, url, job_id)
 
         # Submitting jobs and returning id
         main_job = run(['sbatch', main_fp], stdout=PIPE)
