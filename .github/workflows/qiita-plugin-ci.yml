@@ -84,8 +84,9 @@ jobs:
           conda create -q --yes -n qp-meta python=3.9 biom-format sortmerna=2.1b samtools pigz
           conda activate qp-meta
 
-          export QIITA_SERVER_CERT=`pwd`/qiita-dev/qiita_core/support_files/server.crt
+          export QIITA_SERVER_CERT=`pwd`/qiita-dev/qiita_core/support_files/ci_rootca.crt
           export QIITA_CONFIG_FP=`pwd`/qiita-dev/qiita_core/support_files/config_test_local.cfg
+
           pip --quiet install -U pip
           pip --quiet install .
           pip --quiet install coveralls
@@ -105,7 +106,7 @@ jobs:
         shell: bash -l {0}
         run: |
           conda activate qiita
-          export QIITA_SERVER_CERT=`pwd`/qiita-dev/qiita_core/support_files/server.crt
+          export QIITA_SERVER_CERT=`pwd`/qiita-dev/qiita_core/support_files/ci_rootca.crt
           export QIITA_CONFIG_FP=`pwd`/qiita-dev/qiita_core/support_files/config_test_local.cfg
           sed "s#/home/runner/work/qiita/qiita#${PWD}/qiita-dev/#g" `pwd`/qiita-dev/qiita_core/support_files/config_test.cfg > ${QIITA_CONFIG_FP}
 
@@ -138,7 +139,7 @@ jobs:
         run: |
           conda activate qp-meta
 
-          export QIITA_SERVER_CERT=`pwd`/qiita-dev/qiita_core/support_files/server.crt
+          export QIITA_SERVER_CERT=`pwd`/qiita-dev/qiita_core/support_files/ci_rootca.crt
           export QIITA_CONFIG_FP=`pwd`/qiita-dev/qiita_core/support_files/config_test_local.cfg
           export QC_SORTMERNA_DB_DP=$PWD/qp_meta/sortmerna/databases/rRNA_databases/
           export ENVIRONMENT="source /home/runner/.profile; conda activate qp-meta"
