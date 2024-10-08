@@ -33,5 +33,5 @@ dflt_param_set = {
 }
 
 sortmerna_cmd = QiitaCommand(
-    'Sortmerna v2.1b', "Ribosomal read filtering", sortmerna,
+    'Sortmerna v4.3.2', "Ribosomal read filtering", sortmerna,
     req_params, opt_params, outputs, dflt_param_set)

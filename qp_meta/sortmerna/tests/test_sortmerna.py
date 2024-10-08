@@ -96,7 +96,7 @@ class QC_SortmernaTests(PluginTestCase):
         self.params['input'] = aid
 
         data = {'user': 'demo@microbio.me',
-                'command': dumps(['qp-meta', '2021.11', 'Sortmerna v2.1b']),
+                'command': dumps(['qp-meta', '2024.10', 'Sortmerna v4.3.2']),
                 'status': 'running',
                 'parameters': dumps(self.params)}
         job_id = self.qclient.post(

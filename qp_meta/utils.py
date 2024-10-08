@@ -19,7 +19,7 @@ from qiita_client import ArtifactInfo, QiitaClient
 
 
 plugin_details = {'name': 'qp-meta',
-                  'version': '2021.11',
+                  'version': '2024.10',
                   'description': 'Woltka'}
 
 

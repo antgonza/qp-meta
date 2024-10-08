@@ -81,7 +81,7 @@ jobs:
           conda config --add channels anaconda
           conda config --add channels conda-forge
           conda config --add channels bioconda
-          conda create -q --yes -n qp-meta python=3.9 biom-format sortmerna=2.1b samtools pigz
+          conda create -q --yes -n qp-meta python=3.9 biom-format sortmerna=4.3.2 samtools pigz
           conda activate qp-meta
 
           export QIITA_SERVER_CERT=`pwd`/qiita-dev/qiita_core/support_files/ci_rootca.crt
@@ -93,7 +93,8 @@ jobs:
 
           export QC_SORTMERNA_DB_DP=$PWD/qp_meta/sortmerna/databases/rRNA_databases/
           pushd $QC_SORTMERNA_DB_DP
-          for file in $(ls); do gunzip $file; done
+          wget https://github.com/sortmerna/sortmerna/releases/download/v4.3.4/database.tar.gz
+          tar zxvf database.tar.gz
           popd
 
           configure_meta --env-script "source /home/runner/.profile; conda activate qp-meta; export QC_SORTMERNA_DB_DP=$PWD/qp_meta/sortmerna/databases/rRNA_databases/; export ENVIRONMENT=\"source /home/runner/.profile; conda activate qp-meta\"" --server-cert $QIITA_SERVER_CERT
