@@ -152,7 +152,7 @@ class QC_SortmernaTests(PluginTestCase):
             '#SBATCH --mem 40g\n',
             f'#SBATCH --output {out_dir}/{job_id}_%a.log\n',
             f'#SBATCH --error {out_dir}/{job_id}_%a.err\n',
-            '#SBATCH --array 1-4%8\n',
+            '#SBATCH --array 1-2%8\n',
             'set -e\n',
             f'cd {out_dir}\n',
             f'{self.params["environment"]}\n',
@@ -202,46 +202,18 @@ class QC_SortmernaTests(PluginTestCase):
         with open(f'{out_dir}/sortmerna.array-details') as f:
             details = f.readlines()
         exp_details = [
-            f'unpigz -p 10 -c {adir}/S22205_S104_L001_R1_001.fastq.gz > '
-            f'{out_dir}/S22205_S104_L001_R1_001.fastq && sortmerna --ref '
-            f'{RNA_REF_DB} --reads {out_dir}/S22205_S104_L001_R1_001.fastq '
-            f'--aligned {out_dir}/S22205_S104.ribosomal.R1 --other '
-            f'{out_dir}/S22205_S104.nonribosomal.R1 --fastx -a 10 --blast 1 '
-            '-m 3988 --num_alignments 1 --log && pigz -p 10 -c '
-            f'{out_dir}/S22205_S104.ribosomal.R1.fastq > '
-            f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz && pigz -p 10 -c '
-            f'{out_dir}/S22205_S104.nonribosomal.R1.fastq > '
-            f'{out_dir}/S22205_S104.nonribosomal.R1.fastq.gz;\n',
-            f'unpigz -p 10 -c {adir}/S22205_S104_L001_R2_001.fastq.gz > '
-            f'{out_dir}/S22205_S104_L001_R2_001.fastq && sortmerna --ref '
-            f'{RNA_REF_DB} --reads {out_dir}/S22205_S104_L001_R2_001.fastq '
-            f'--aligned {out_dir}/S22205_S104.ribosomal.R2 --other '
-            f'{out_dir}/S22205_S104.nonribosomal.R2 --fastx -a 10 --blast 1 '
-            '-m 3988 --num_alignments 1 --log && pigz -p 10 -c '
-            f'{out_dir}/S22205_S104.ribosomal.R2.fastq > '
-            f'{out_dir}/S22205_S104.ribosomal.R2.fastq.gz && pigz -p 10 -c '
-            f'{out_dir}/S22205_S104.nonribosomal.R2.fastq > '
-            f'{out_dir}/S22205_S104.nonribosomal.R2.fastq.gz;\n',
-            f'unpigz -p 10 -c {adir}/S22282_S102_L001_R1_001.fastq.gz > '
-            f'{out_dir}/S22282_S102_L001_R1_001.fastq && sortmerna --ref '
-            f'{RNA_REF_DB} --reads {out_dir}/S22282_S102_L001_R1_001.fastq '
-            f'--aligned {out_dir}/S22282_S102.ribosomal.R1 --other '
-            f'{out_dir}/S22282_S102.nonribosomal.R1 --fastx -a 10 --blast 1 '
-            '-m 3988 --num_alignments 1 --log && pigz -p 10 -c '
-            f'{out_dir}/S22282_S102.ribosomal.R1.fastq > '
-            f'{out_dir}/S22282_S102.ribosomal.R1.fastq.gz && pigz -p 10 -c '
-            f'{out_dir}/S22282_S102.nonribosomal.R1.fastq > '
-            f'{out_dir}/S22282_S102.nonribosomal.R1.fastq.gz;\n',
-            f'unpigz -p 10 -c {adir}/S22282_S102_L001_R2_001.fastq.gz > '
-            f'{out_dir}/S22282_S102_L001_R2_001.fastq && sortmerna --ref '
-            f'{RNA_REF_DB} --reads {out_dir}/S22282_S102_L001_R2_001.fastq '
-            f'--aligned {out_dir}/S22282_S102.ribosomal.R2 --other '
-            f'{out_dir}/S22282_S102.nonribosomal.R2 --fastx -a 10 --blast 1 '
-            '-m 3988 --num_alignments 1 --log && pigz -p 10 -c '
-            f'{out_dir}/S22282_S102.ribosomal.R2.fastq > '
-            f'{out_dir}/S22282_S102.ribosomal.R2.fastq.gz && pigz -p 10 -c '
-            f'{out_dir}/S22282_S102.nonribosomal.R2.fastq > '
-            f'{out_dir}/S22282_S102.nonribosomal.R2.fastq.gz;']
+            f'sortmerna {RNA_REF_DB} '
+            f'--reads {adir}/S22205_S104_L001_R1_001.fastq.gz '
+            f'--reads {adir}/S22205_S104_L001_R2_001.fastq.gz '
+            f'--workdir {out_dir}/S22205_S104 --other --aligned --fastx '
+            f'--blast 1 --num_alignments 1 --threads 10 --paired_in --out2 '
+            '-m 3988 --log\n',
+            f'sortmerna {RNA_REF_DB} '
+            f'--reads {adir}/S22282_S102_L001_R1_001.fastq.gz '
+            f'--reads {adir}/S22282_S102_L001_R2_001.fastq.gz '
+            f'--workdir {out_dir}/S22282_S102 --other --aligned --fastx '
+            f'--blast 1 --num_alignments 1 --threads 10 --paired_in --out2 '
+            '-m 3988 --log']
         self.assertEqual(exp_details, details)
 
         # making sure it finishes correctly
@@ -375,26 +347,16 @@ class QC_SortmernaTests(PluginTestCase):
         with open(f'{out_dir}/sortmerna.array-details') as f:
             details = f.readlines()
         exp_details = [
-            f'unpigz -p 10 -c {adir}/S22205_S104_L001_R1_001.fastq.gz > '
-            f'{out_dir}/S22205_S104_L001_R1_001.fastq && sortmerna --ref '
-            f'{RNA_REF_DB} --reads {out_dir}/S22205_S104_L001_R1_001.fastq '
-            f'--aligned {out_dir}/S22205_S104.ribosomal.R1 --other '
-            f'{out_dir}/S22205_S104.nonribosomal.R1 --fastx -a 10 --blast 1 '
-            '-m 3988 --num_alignments 1 --log && pigz -p 10 -c '
-            f'{out_dir}/S22205_S104.ribosomal.R1.fastq > '
-            f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz && pigz -p 10 -c '
-            f'{out_dir}/S22205_S104.nonribosomal.R1.fastq > '
-            f'{out_dir}/S22205_S104.nonribosomal.R1.fastq.gz;\n',
-            f'unpigz -p 10 -c {adir}/S22282_S102_L001_R1_001.fastq.gz > '
-            f'{out_dir}/S22282_S102_L001_R1_001.fastq && sortmerna --ref '
-            f'{RNA_REF_DB} --reads {out_dir}/S22282_S102_L001_R1_001.fastq '
-            f'--aligned {out_dir}/S22282_S102.ribosomal.R1 --other '
-            f'{out_dir}/S22282_S102.nonribosomal.R1 --fastx -a 10 --blast 1 '
-            '-m 3988 --num_alignments 1 --log && pigz -p 10 -c '
-            f'{out_dir}/S22282_S102.ribosomal.R1.fastq > '
-            f'{out_dir}/S22282_S102.ribosomal.R1.fastq.gz && pigz -p 10 -c '
-            f'{out_dir}/S22282_S102.nonribosomal.R1.fastq > '
-            f'{out_dir}/S22282_S102.nonribosomal.R1.fastq.gz;']
+            f'sortmerna {RNA_REF_DB} '
+            f'--reads {adir}/S22205_S104_L001_R1_001.fastq.gz '
+            f'--workdir {out_dir}/S22205_S104 --other --aligned --fastx '
+            f'--blast 1 --num_alignments 1 --threads 10 '
+            '--out2 -m 3988 --log\n',
+            f'sortmerna {RNA_REF_DB} '
+            f'--reads {adir}/S22282_S102_L001_R1_001.fastq.gz '
+            f'--workdir {out_dir}/S22282_S102 --other --aligned --fastx '
+            f'--blast 1 --num_alignments 1 --threads 10 '
+            '--out2 -m 3988 --log']
         self.assertEqual(exp_details, details)
 
         # making sure it finishes correctly

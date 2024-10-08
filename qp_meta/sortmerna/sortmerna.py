@@ -7,38 +7,15 @@
 # -----------------------------------------------------------------------------
 
 
-from os.path import join, basename
+from os.path import join
 from os import environ
 from qp_meta.utils import (
-    _format_params, make_read_pairs_per_sample,
+    make_read_pairs_per_sample,
     _per_sample_ainfo, _generate_qiime_mapping_file)
 
 DIR = environ["QC_SORTMERNA_DB_DP"]
 
-RNA_REF_DB = (
-    '{0}silva-arc-23s-id98.fasta,'
-    '{0}silva-arc-23s-id98.idx:'
-    '{0}silva-bac-16s-id90.fasta,'
-    '{0}silva-bac-16s-id90.idx:'
-    '{0}silva-bac-23s-id98.fasta,'
-    '{0}silva-bac-23s-id98.idx:'
-    '{0}silva-arc-16s-id95.fasta,'
-    '{0}silva-arc-16s-id95.idx:'
-    '{0}silva-euk-18s-id95.fasta,'
-    '{0}silva-euk-18s-id95.idx:'
-    '{0}silva-euk-28s-id98.fasta,'
-    '{0}silva-euk-28s-id98.idx:'
-    '{0}rfam-5s-database-id98.fasta,'
-    '{0}rfam-5s-database-id98.idx:'
-    '{0}rfam-5.8s-database-id98.fasta,'
-    '{0}rfam-5.8s-database-id98.idx'
-).format(DIR)
-
-
-SORTMERNA_PARAMS = {
-    'blast': 'Output blast format',
-    'num_alignments': 'Number of alignments',
-    'm': 'Memory'}
+RNA_REF_DB = ('--ref {0}smr_v4.3_default_db.fasta').format(DIR)
 
 
 # resources per job
@@ -85,43 +62,28 @@ def generate_sortmerna_commands(forward_seqs, reverse_seqs, map_file,
     samples = make_read_pairs_per_sample(forward_seqs, reverse_seqs, map_file)
 
     cmds = []
-    param_string = _format_params(parameters, SORTMERNA_PARAMS)
+    # --aligned {smr_r_op} --other {smr_nr_op}
+    if reverse_seqs:
+        template = (
+            "sortmerna {ref_db} --reads {fwd} --reads {rev} --workdir {wkdir} "
+            "--other --aligned --fastx --blast 1 --num_alignments 1 "
+            "--threads {thrds} --paired_in --out2 -m 3988 --log")
+    else:
+        template = (
+            "sortmerna {ref_db} --reads {fwd} --workdir {wkdir} "
+            "--other --aligned --fastx --blast 1 --num_alignments 1 "
+            "--threads {thrds} --out2 -m 3988 --log")
 
-    # Sortmerna 2.1 does not support direct processing of
-    # compressed files currently
-    # note SMR auto-detects file type and adds .fastq extension
-    # to the generated output files
-
-    template = ("unpigz -p {thrds} -c {ip} > {ip_unpigz} && "
-                "sortmerna --ref {ref_db} --reads {ip_unpigz} "
-                "--aligned {smr_r_op} --other {smr_nr_op} "
-                "--fastx -a {thrds} {params} --log && "
-                "pigz -p {thrds} -c {smr_r_op}.fastq > {smr_r_op_gz} && "
-                "pigz -p {thrds} -c {smr_nr_op}.fastq > {smr_nr_op_gz};"
-                )
-
-    arguments = {'thrds': PPN,
-                 'ref_db': RNA_REF_DB, 'params': param_string}
-
+    arguments = {'thrds': PPN, 'ref_db': RNA_REF_DB}
     for run_prefix, sample, f_fp, r_fp in samples:
-        prefix_path = join(out_dir, run_prefix)
+        arguments['wkdir'] = join(out_dir, run_prefix)
+        arguments['fwd'] = f_fp
+        arguments['rev'] = r_fp
 
-        for index, fp in enumerate([f_fp, r_fp]):
-            # if reverse filepath is not present ignore it
-            if fp is None:
-                continue
+        # arguments['smr_r_op_gz'] = arguments['smr_r_op'] + '.fastq.gz'
+        # arguments['smr_nr_op_gz'] = arguments['smr_nr_op'] + '.fastq.gz'
 
-            arguments['ip'] = fp
-            arguments['ip_unpigz'] = join(
-                out_dir, basename(fp.replace('.fastq.gz', '.fastq')))
-            arguments['smr_r_op'] = prefix_path + '.ribosomal.R%d'\
-                % (index + 1)
-            arguments['smr_nr_op'] = prefix_path + '.nonribosomal.R%d'\
-                % (index + 1)
-            arguments['smr_r_op_gz'] = arguments['smr_r_op'] + '.fastq.gz'
-            arguments['smr_nr_op_gz'] = arguments['smr_nr_op'] + '.fastq.gz'
-
-            cmds.append(template.format(**arguments))
+        cmds.append(template.format(**arguments))
 
     return cmds, samples
     # In this version I have not added a summary file or sam file
