@@ -92,6 +92,10 @@ jobs:
           pip --quiet install coveralls
 
           export QC_SORTMERNA_DB_DP=$PWD/qp_meta/sortmerna/databases/
+          ls $PWD/
+          ls $PWD/qp_meta/
+          ls $PWD/qp_meta/sortmerna/
+          ls $PWD/qp_meta/sortmerna/databases/
           pushd $QC_SORTMERNA_DB_DP
           mkdir rRNA_databases/
           cd rRNA_databases/
