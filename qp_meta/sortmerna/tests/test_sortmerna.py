@@ -205,6 +205,8 @@ class QC_SortmernaTests(PluginTestCase):
             f'--workdir {out_dir}/S22205_S104 --other --aligned --fastx '
             f'--blast 1 --num_alignments 1 --threads 10 --paired_in --out2 '
             '-index 0; '
+            f"mv {out_dir}/S22205_S104/out/aligned.log "
+            f"{out_dir}/S22205_S104.ribosomal.R1.log; "
             f'mv {out_dir}/S22205_S104/out/aligned_fwd.fq.gz '
             f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz; '
             f'mv {out_dir}/S22205_S104/out/aligned_rev.fq.gz '
@@ -219,6 +221,8 @@ class QC_SortmernaTests(PluginTestCase):
             f'--workdir {out_dir}/S22282_S102 --other --aligned --fastx '
             f'--blast 1 --num_alignments 1 --threads 10 --paired_in --out2 '
             '-index 0; '
+            f"mv {out_dir}/S22282_S102/out/aligned.log "
+            f"{out_dir}/S22282_S102.ribosomal.R1.log; "
             f'mv {out_dir}/S22282_S102/out/aligned_fwd.fq.gz '
             f'{out_dir}/S22282_S102.ribosomal.R1.fastq.gz; '
             f'mv {out_dir}/S22282_S102/out/aligned_rev.fq.gz '
@@ -365,6 +369,8 @@ class QC_SortmernaTests(PluginTestCase):
             f'--workdir {out_dir}/S22205_S104 --other --aligned --fastx '
             f'--blast 1 --num_alignments 1 --threads 10 '
             '--out2 -index 0; '
+            f'mv {out_dir}/S22205_S104/out/aligned.log '
+            f'{out_dir}/S22205_S104.ribosomal.R1.log; '
             f'mv {out_dir}/S22205_S104/out/aligned_fwd.fq.gz '
             f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz; '
             f'mv {out_dir}/S22205_S104/out/other_fwd.fq.gz '
@@ -374,6 +380,8 @@ class QC_SortmernaTests(PluginTestCase):
             f'--workdir {out_dir}/S22282_S102 --other --aligned --fastx '
             f'--blast 1 --num_alignments 1 --threads 10 '
             '--out2 -index 0; '
+            f"mv {out_dir}/S22282_S102/out/aligned.log "
+            f"{out_dir}/S22282_S102.ribosomal.R1.log; "
             f'mv {out_dir}/S22282_S102/out/aligned_fwd.fq.gz '
             f'{out_dir}/S22282_S102.ribosomal.R1.fastq.gz; '
             f'mv {out_dir}/S22282_S102/out/other_fwd.fq.gz '
