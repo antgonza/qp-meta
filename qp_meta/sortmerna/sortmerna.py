@@ -15,7 +15,8 @@ from qp_meta.utils import (
 
 DIR = environ["QC_SORTMERNA_DB_DP"]
 
-RNA_REF_DB = ('--ref {0}smr_v4.3_default_db.fasta').format(DIR)
+RNA_REF_DB = (
+    '--ref {0}smr_v4.3_default_db.fasta --idx-dir {0}idx/').format(DIR)
 
 
 # resources per job
@@ -62,26 +63,36 @@ def generate_sortmerna_commands(forward_seqs, reverse_seqs, map_file,
     samples = make_read_pairs_per_sample(forward_seqs, reverse_seqs, map_file)
 
     cmds = []
-    # --aligned {smr_r_op} --other {smr_nr_op}
+
     if reverse_seqs:
         template = (
             "sortmerna {ref_db} --reads {fwd} --reads {rev} --workdir {wkdir} "
             "--other --aligned --fastx --blast 1 --num_alignments 1 "
-            "--threads {thrds} --paired_in --out2 -m 3988 --log")
+            "--threads {thrds} --paired_in --out2 -index 0; "
+            "mv {wkdir}/out/aligned_fwd.fq.gz {out_dir}/{fname}."
+            "ribosomal.R1.fastq.gz; "
+            "mv {wkdir}/out/aligned_rev.fq.gz {out_dir}/{fname}."
+            "ribosomal.R2.fastq.gz; "
+            "mv {wkdir}/out/other_fwd.fq.gz {out_dir}/{fname}."
+            "nonribosomal.R1.fastq.gz; "
+            "mv {wkdir}/out/other_rev.fq.gz {out_dir}/{fname}."
+            "nonribosomal.R2.fastq.gz; ")
     else:
         template = (
             "sortmerna {ref_db} --reads {fwd} --workdir {wkdir} "
             "--other --aligned --fastx --blast 1 --num_alignments 1 "
-            "--threads {thrds} --out2 -m 3988 --log")
+            "--threads {thrds} --out2 -index 0; "
+            "mv {wkdir}/out/aligned_fwd.fq.gz {out_dir}/{fname}."
+            "ribosomal.R1.fastq.gz; "
+            "mv {wkdir}/out/other_fwd.fq.gz {out_dir}/{fname}."
+            "nonribosomal.R1.fastq.gz; ")
 
-    arguments = {'thrds': PPN, 'ref_db': RNA_REF_DB}
+    arguments = {'thrds': PPN, 'ref_db': RNA_REF_DB, 'out_dir': out_dir}
     for run_prefix, sample, f_fp, r_fp in samples:
         arguments['wkdir'] = join(out_dir, run_prefix)
         arguments['fwd'] = f_fp
         arguments['rev'] = r_fp
-
-        # arguments['smr_r_op_gz'] = arguments['smr_r_op'] + '.fastq.gz'
-        # arguments['smr_nr_op_gz'] = arguments['smr_nr_op'] + '.fastq.gz'
+        arguments['fname'] = run_prefix
 
         cmds.append(template.format(**arguments))
 

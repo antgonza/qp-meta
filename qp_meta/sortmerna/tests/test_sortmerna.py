@@ -35,11 +35,7 @@ class QC_SortmernaTests(PluginTestCase):
     def setUp(self):
         plugin("https://localhost:21174", 'register', 'ignored')
 
-        self.params = {
-                       'Output blast format': '1',
-                       'Number of alignments': '1',
-                       'Memory': '3988',
-        }
+        self.params = {}
         self._clean_up_files = []
 
     def tearDown(self):
@@ -51,12 +47,13 @@ class QC_SortmernaTests(PluginTestCase):
                     remove(fp)
 
     def test_format_sortmerna_params(self):
-        obs = _format_params(self.params, SORTMERNA_PARAMS)
-        exp = (
-               '--blast 1 '
+        obs = _format_params(
+            {'Output blast format': '1',
+             'Number of alignments': '1',
+             'Memory': '3988'}, SORTMERNA_PARAMS)
+        exp = ('--blast 1 '
                '-m 3988 '
-               '--num_alignments 1'
-               )
+               '--num_alignments 1')
         self.assertEqual(obs, exp)
 
     def _helper_tester(self, prep_info_dict, just_forward=True):
@@ -96,7 +93,7 @@ class QC_SortmernaTests(PluginTestCase):
         self.params['input'] = aid
 
         data = {'user': 'demo@microbio.me',
-                'command': dumps(['qp-meta', '2024.10', 'Sortmerna v4.3.2']),
+                'command': dumps(['qp-meta', '2024.10', 'SortMeRNA v4.3.7']),
                 'status': 'running',
                 'parameters': dumps(self.params)}
         job_id = self.qclient.post(
@@ -207,13 +204,29 @@ class QC_SortmernaTests(PluginTestCase):
             f'--reads {adir}/S22205_S104_L001_R2_001.fastq.gz '
             f'--workdir {out_dir}/S22205_S104 --other --aligned --fastx '
             f'--blast 1 --num_alignments 1 --threads 10 --paired_in --out2 '
-            '-m 3988 --log\n',
+            '-index 0; '
+            f'mv {out_dir}/S22205_S104/out/aligned_fwd.fq.gz '
+            f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz; '
+            f'mv {out_dir}/S22205_S104/out/aligned_rev.fq.gz '
+            f'{out_dir}/S22205_S104.ribosomal.R2.fastq.gz; '
+            f'mv {out_dir}/S22205_S104/out/other_fwd.fq.gz '
+            f'{out_dir}/S22205_S104.nonribosomal.R1.fastq.gz; '
+            f'mv {out_dir}/S22205_S104/out/other_rev.fq.gz '
+            f'{out_dir}/S22205_S104.nonribosomal.R2.fastq.gz; \n',
             f'sortmerna {RNA_REF_DB} '
             f'--reads {adir}/S22282_S102_L001_R1_001.fastq.gz '
             f'--reads {adir}/S22282_S102_L001_R2_001.fastq.gz '
             f'--workdir {out_dir}/S22282_S102 --other --aligned --fastx '
             f'--blast 1 --num_alignments 1 --threads 10 --paired_in --out2 '
-            '-m 3988 --log']
+            '-index 0; '
+            f'mv {out_dir}/S22282_S102/out/aligned_fwd.fq.gz '
+            f'{out_dir}/S22282_S102.ribosomal.R1.fastq.gz; '
+            f'mv {out_dir}/S22282_S102/out/aligned_rev.fq.gz '
+            f'{out_dir}/S22282_S102.ribosomal.R2.fastq.gz; '
+            f'mv {out_dir}/S22282_S102/out/other_fwd.fq.gz '
+            f'{out_dir}/S22282_S102.nonribosomal.R1.fastq.gz; '
+            f'mv {out_dir}/S22282_S102/out/other_rev.fq.gz '
+            f'{out_dir}/S22282_S102.nonribosomal.R2.fastq.gz; ']
         self.assertEqual(exp_details, details)
 
         # making sure it finishes correctly
@@ -351,12 +364,20 @@ class QC_SortmernaTests(PluginTestCase):
             f'--reads {adir}/S22205_S104_L001_R1_001.fastq.gz '
             f'--workdir {out_dir}/S22205_S104 --other --aligned --fastx '
             f'--blast 1 --num_alignments 1 --threads 10 '
-            '--out2 -m 3988 --log\n',
+            '--out2 -index 0; '
+            f'mv {out_dir}/S22205_S104/out/aligned_fwd.fq.gz '
+            f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz; '
+            f'mv {out_dir}/S22205_S104/out/other_fwd.fq.gz '
+            f'{out_dir}/S22205_S104.nonribosomal.R1.fastq.gz; \n',
             f'sortmerna {RNA_REF_DB} '
             f'--reads {adir}/S22282_S102_L001_R1_001.fastq.gz '
             f'--workdir {out_dir}/S22282_S102 --other --aligned --fastx '
             f'--blast 1 --num_alignments 1 --threads 10 '
-            '--out2 -m 3988 --log']
+            '--out2 -index 0; '
+            f'mv {out_dir}/S22282_S102/out/aligned_fwd.fq.gz '
+            f'{out_dir}/S22282_S102.ribosomal.R1.fastq.gz; '
+            f'mv {out_dir}/S22282_S102/out/other_fwd.fq.gz '
+            f'{out_dir}/S22282_S102.nonribosomal.R1.fastq.gz; ']
         self.assertEqual(exp_details, details)
 
         # making sure it finishes correctly
