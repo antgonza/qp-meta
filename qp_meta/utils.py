@@ -161,6 +161,7 @@ def _per_sample_ainfo(
     smd = partial(join, out_dir)
     logs = []
     for rp, _, _, _ in samples:
+        logs.append(smd(f'{rp}.log'))
         for suff in suffixes:
             fname = smd(suff % rp)
             if exists(fname):
@@ -173,7 +174,6 @@ def _per_sample_ainfo(
                     # to reproduce so no tests!
                     raise ValueError('File %s has an unexpected name' % fname)
                 files.append((fname, ftype))
-                logs.append(basename(fname).replace('.fastq.gz', '.log'))
             else:
                 missing_files.append(fname)
 

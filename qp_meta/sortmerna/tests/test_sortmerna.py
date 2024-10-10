@@ -206,7 +206,7 @@ class QC_SortmernaTests(PluginTestCase):
             f'--blast 1 --num_alignments 1 --threads 10 --paired_in --out2 '
             '-index 0; '
             f"mv {out_dir}/S22205_S104/out/aligned.log "
-            f"{out_dir}/S22205_S104.ribosomal.R1.log; "
+            f"{out_dir}/S22205_S104.log; "
             f'mv {out_dir}/S22205_S104/out/aligned_fwd.fq.gz '
             f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz; '
             f'mv {out_dir}/S22205_S104/out/aligned_rev.fq.gz '
@@ -222,7 +222,7 @@ class QC_SortmernaTests(PluginTestCase):
             f'--blast 1 --num_alignments 1 --threads 10 --paired_in --out2 '
             '-index 0; '
             f"mv {out_dir}/S22282_S102/out/aligned.log "
-            f"{out_dir}/S22282_S102.ribosomal.R1.log; "
+            f"{out_dir}/S22282_S102.log; "
             f'mv {out_dir}/S22282_S102/out/aligned_fwd.fq.gz '
             f'{out_dir}/S22282_S102.ribosomal.R1.fastq.gz; '
             f'mv {out_dir}/S22282_S102/out/aligned_rev.fq.gz '
@@ -256,7 +256,7 @@ class QC_SortmernaTests(PluginTestCase):
             if f[1] == 'log':
                 continue
             copyfile(infile, f[0])
-            copyfile(infile, f[0].replace('fastq.gz', 'log'))
+            copyfile(infile, f[0].replace('.ribosomal.R1.fastq.gz', '.log'))
         success, ainfo, msg = sortmerna(
             self.qclient, job_id, self.params, out_dir)
 
@@ -370,7 +370,7 @@ class QC_SortmernaTests(PluginTestCase):
             f'--blast 1 --num_alignments 1 --threads 10 '
             '--out2 -index 0; '
             f'mv {out_dir}/S22205_S104/out/aligned.log '
-            f'{out_dir}/S22205_S104.ribosomal.R1.log; '
+            f'{out_dir}/S22205_S104.log; '
             f'mv {out_dir}/S22205_S104/out/aligned_fwd.fq.gz '
             f'{out_dir}/S22205_S104.ribosomal.R1.fastq.gz; '
             f'mv {out_dir}/S22205_S104/out/other_fwd.fq.gz '
@@ -381,7 +381,7 @@ class QC_SortmernaTests(PluginTestCase):
             f'--blast 1 --num_alignments 1 --threads 10 '
             '--out2 -index 0; '
             f"mv {out_dir}/S22282_S102/out/aligned.log "
-            f"{out_dir}/S22282_S102.ribosomal.R1.log; "
+            f"{out_dir}/S22282_S102.log; "
             f'mv {out_dir}/S22282_S102/out/aligned_fwd.fq.gz '
             f'{out_dir}/S22282_S102.ribosomal.R1.fastq.gz; '
             f'mv {out_dir}/S22282_S102/out/other_fwd.fq.gz '
@@ -403,7 +403,7 @@ class QC_SortmernaTests(PluginTestCase):
             if f[1] == 'log':
                 continue
             copyfile(infile, f[0])
-            copyfile(infile, f[0].replace('fastq.gz', 'log'))
+            copyfile(infile, f[0].replace('.ribosomal.R1.fastq.gz', '.log'))
         success, ainfo, msg = sortmerna(
             self.qclient, job_id, self.params, out_dir)
 
