@@ -21,11 +21,11 @@ RNA_REF_DB = (
 
 # resources per job
 PPN = 10
-MEMORY = '40g'
+MEMORY = '4g'
 WALLTIME = '30:00:00'
 FINISH_MEMORY = '1g'
 FINISH_WALLTIME = '10:00:00'
-MAX_RUNNING = 8
+MAX_RUNNING = 12
 
 
 def generate_sortmerna_commands(forward_seqs, reverse_seqs, map_file,
