@@ -19,7 +19,7 @@ from qiita_client import ArtifactInfo, QiitaClient
 
 
 plugin_details = {'name': 'qp-meta',
-                  'version': '2021.11',
+                  'version': '2024.10',
                   'description': 'Woltka'}
 
 
@@ -161,6 +161,7 @@ def _per_sample_ainfo(
     smd = partial(join, out_dir)
     logs = []
     for rp, _, _, _ in samples:
+        logs.append(smd(f'{rp}.log'))
         for suff in suffixes:
             fname = smd(suff % rp)
             if exists(fname):
@@ -173,7 +174,6 @@ def _per_sample_ainfo(
                     # to reproduce so no tests!
                     raise ValueError('File %s has an unexpected name' % fname)
                 files.append((fname, ftype))
-                logs.append(basename(fname).replace('.fastq.gz', '.log'))
             else:
                 missing_files.append(fname)
 
@@ -220,6 +220,6 @@ def client_connect(url):
         config.readfp(conf_file)
     qclient = QiitaClient(url, config.get('oauth2', 'CLIENT_ID'),
                           config.get('oauth2', 'CLIENT_SECRET'),
-                          server_cert=config.get('oauth2', 'SERVER_CERT'))
+                          config.get('oauth2', 'SERVER_CERT'))
 
     return qclient

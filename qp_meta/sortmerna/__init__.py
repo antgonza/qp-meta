@@ -14,24 +14,16 @@ __all__ = ['sortmerna']
 
 # Defining the Sortmerna command
 req_params = {'input': ('artifact', ['per_sample_FASTQ'])}
-opt_params = {
-    'Output blast format': ['integer', '1'],
-    'Number of alignments': ['integer', '1'],
-    'Memory': ['integer', '3988']
-    }
+opt_params = {}
 outputs = {'Non-ribosomal reads': 'per_sample_FASTQ',
            'Ribosomal reads': 'per_sample_FASTQ'}
 
 # defining default parameter set AKA what's going to be shown to the user
 # as options for the command
 dflt_param_set = {
-    'Ribosomal read filtering': {
-        'Output blast format': 1,
-        'Number of alignments': 1,
-        'Memory': 31000
-    }
+    'Ribosomal read filtering': {}
 }
 
 sortmerna_cmd = QiitaCommand(
-    'Sortmerna v2.1b', "Ribosomal read filtering", sortmerna,
+    'SortMeRNA v4.3.7', "Ribosomal read filtering", sortmerna,
     req_params, opt_params, outputs, dflt_param_set)
